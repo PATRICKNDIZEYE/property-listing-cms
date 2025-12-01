@@ -1,0 +1,169 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  password      String?   // Hashed password for credentials auth
+  role          UserRole  @default(USER)
+  image         String?
+  emailVerified DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  accounts      Account[]
+  sessions      Session[]
+
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+model Property {
+  id           String   @id @default(cuid())
+  propertyImg  String
+  propertyTitle String
+  propertyPrice String
+  category     String
+  categoryImg  String
+  rooms        Int
+  bathrooms    Int
+  location     String
+  livingArea   String
+  tag          String
+  check        Boolean  @default(true)
+  status       String
+  type         String
+  beds         Int
+  garages      Int
+  region       String
+  name         String
+  slug         String   @unique
+  description  String?  @db.Text
+  featured     Boolean  @default(false)
+  views        Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  images       Image[]
+
+  @@map("properties")
+}
+
+model Blog {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  excerpt     String?  @db.Text
+  content     String   @db.Text
+  coverImage  String?
+  author      String?
+  published   Boolean  @default(false)
+  views       Int      @default(0)
+  date        DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("blogs")
+}
+
+model Image {
+  id          String   @id @default(cuid())
+  url         String
+  filename    String
+  path        String
+  mimeType    String
+  size        Int
+  propertyId  String?
+  property    Property? @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+
+  @@map("images")
+}
+
+model SiteSettings {
+  id              String   @id @default(cuid())
+  siteTitle       String   @default("Property")
+  siteDescription String?  @db.Text
+  siteLogo        String?
+  contactEmail    String?
+  contactPhone    String?
+  contactAddress  String?  @db.Text
+  facebookUrl     String?
+  twitterUrl      String?
+  instagramUrl    String?
+  linkedinUrl     String?
+  seoTitle        String?
+  seoDescription  String?  @db.Text
+  seoKeywords     String?  @db.Text
+  headerMenu      Json?    // Store navigation menu structure
+  footerText      String?  @db.Text
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("site_settings")
+}
+
+model Analytics {
+  id          String   @id @default(cuid())
+  eventType   String   // 'property_view', 'blog_view', 'page_view', etc.
+  entityType  String?  // 'property', 'blog', 'page'
+  entityId    String?
+  metadata    Json?    // Additional event data
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+
+  @@map("analytics")
+}
+
