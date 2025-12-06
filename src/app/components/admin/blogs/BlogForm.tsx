@@ -119,7 +119,7 @@ export default function BlogForm({ blogId }: BlogFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white dark:bg-semidark p-6 rounded-lg shadow-property">
+    <form onSubmit={handleSubmit} className="bg-white dark:bg-semidark p-8 rounded-xl shadow-lg">
       <div className="space-y-6">
         <div>
           <label className="block text-sm font-medium text-midnight_text dark:text-white mb-2">
@@ -233,18 +233,18 @@ export default function BlogForm({ blogId }: BlogFormProps) {
         </div>
       </div>
 
-      <div className="mt-6 flex gap-4">
+      <div className="mt-8 flex gap-4 pt-6 border-t border-border dark:border-dark_border">
         <button
           type="submit"
           disabled={loading}
-          className="bg-primary text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+          className="bg-primary text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-all duration-200 disabled:opacity-50 shadow-md hover:shadow-lg font-medium"
         >
           {loading ? 'Saving...' : blogId ? 'Update Blog' : 'Create Blog'}
         </button>
         <button
           type="button"
           onClick={() => router.back()}
-          className="bg-transparent border border-border dark:border-dark_border text-midnight_text dark:text-white px-6 py-3 rounded-lg hover:bg-light dark:hover:bg-darklight transition-colors"
+          className="bg-transparent border border-border dark:border-dark_border text-midnight_text dark:text-white px-8 py-3 rounded-lg hover:bg-light dark:hover:bg-darklight transition-colors font-medium"
         >
           Cancel
         </button>

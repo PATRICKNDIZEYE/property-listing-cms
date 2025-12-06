@@ -2,6 +2,7 @@ import { getServerSession } from 'next-auth';
 import { prisma } from './prisma';
 import bcrypt from 'bcryptjs';
 import { UserRole } from '@/app/types/auth';
+import { authOptions } from './auth-config';
 
 export async function verifyPassword(password: string, hashedPassword: string) {
   return bcrypt.compare(password, hashedPassword);
@@ -12,7 +13,7 @@ export async function hashPassword(password: string) {
 }
 
 export async function getCurrentUser() {
-  const session = await getServerSession();
+  const session = await getServerSession(authOptions);
   if (!session?.user?.email) return null;
 
   const user = await prisma.user.findUnique({

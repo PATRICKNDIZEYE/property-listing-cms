@@ -2,8 +2,8 @@ import React from 'react'
 import { getAllPosts } from "@/utils/markdown";
 import BlogCard from './blogCard';
 
-const BlogSmall: React.FC = () => {
-    const posts = getAllPosts(["title", "date", "excerpt", "coverImage", "slug"]).slice(0, 2);
+const BlogSmall = async () => {
+    const posts = (await getAllPosts(["title", "date", "excerpt", "coverImage", "slug"])).slice(0, 2);
 
     return (
         <section className="flex flex-col dark:bg-darkmode px-4 md:px-4">

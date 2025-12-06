@@ -107,12 +107,15 @@ export default function SettingsForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white dark:bg-semidark p-6 rounded-lg shadow-property">
-      <div className="space-y-6">
-        <div>
-          <h2 className="text-xl font-bold text-midnight_text dark:text-white mb-4">
+    <form onSubmit={handleSubmit} className="bg-white dark:bg-semidark p-8 rounded-xl shadow-lg">
+      <div className="space-y-8">
+        <div className="pb-6 border-b border-border dark:border-dark_border">
+          <h2 className="text-xl font-bold text-midnight_text dark:text-white mb-1">
             General Settings
           </h2>
+          <p className="text-sm text-gray dark:text-gray">Basic site information</p>
+        </div>
+        <div className="pt-6">
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-midnight_text dark:text-white mb-2">
@@ -153,10 +156,13 @@ export default function SettingsForm() {
           </div>
         </div>
 
-        <div>
-          <h2 className="text-xl font-bold text-midnight_text dark:text-white mb-4">
+        <div className="pb-6 border-b border-border dark:border-dark_border">
+          <h2 className="text-xl font-bold text-midnight_text dark:text-white mb-1">
             Contact Information
           </h2>
+          <p className="text-sm text-gray dark:text-gray">How users can reach you</p>
+        </div>
+        <div className="pt-6">
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-midnight_text dark:text-white mb-2">
@@ -197,10 +203,13 @@ export default function SettingsForm() {
           </div>
         </div>
 
-        <div>
-          <h2 className="text-xl font-bold text-midnight_text dark:text-white mb-4">
+        <div className="pb-6 border-b border-border dark:border-dark_border">
+          <h2 className="text-xl font-bold text-midnight_text dark:text-white mb-1">
             Social Media
           </h2>
+          <p className="text-sm text-gray dark:text-gray">Your social media profiles</p>
+        </div>
+        <div className="pt-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-midnight_text dark:text-white mb-2">
@@ -253,10 +262,13 @@ export default function SettingsForm() {
           </div>
         </div>
 
-        <div>
-          <h2 className="text-xl font-bold text-midnight_text dark:text-white mb-4">
+        <div className="pb-6 border-b border-border dark:border-dark_border">
+          <h2 className="text-xl font-bold text-midnight_text dark:text-white mb-1">
             SEO Settings
           </h2>
+          <p className="text-sm text-gray dark:text-gray">Search engine optimization</p>
+        </div>
+        <div className="pt-6">
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-midnight_text dark:text-white mb-2">
@@ -298,10 +310,13 @@ export default function SettingsForm() {
           </div>
         </div>
 
-        <div>
-          <h2 className="text-xl font-bold text-midnight_text dark:text-white mb-4">
+        <div className="pb-6 border-b border-border dark:border-dark_border">
+          <h2 className="text-xl font-bold text-midnight_text dark:text-white mb-1">
             Footer
           </h2>
+          <p className="text-sm text-gray dark:text-gray">Footer content</p>
+        </div>
+        <div className="pt-6">
           <div>
             <label className="block text-sm font-medium text-midnight_text dark:text-white mb-2">
               Footer Text
@@ -317,11 +332,11 @@ export default function SettingsForm() {
         </div>
       </div>
 
-      <div className="mt-6">
+      <div className="mt-8 pt-6 border-t border-border dark:border-dark_border">
         <button
           type="submit"
           disabled={loading}
-          className="bg-primary text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+          className="bg-primary text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-all duration-200 disabled:opacity-50 shadow-md hover:shadow-lg font-medium"
         >
           {loading ? 'Saving...' : 'Save Settings'}
         </button>

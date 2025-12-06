@@ -8,8 +8,8 @@ type Props = {
 };
 
 export async function generateMetadata({ params }: Props) {
-    const posts = getAllPosts(["title", "date", "excerpt", "coverImage", "slug"]);
-    const post = getPostBySlug(params.slug, [
+    const posts = await getAllPosts(["title", "date", "excerpt", "coverImage", "slug"]);
+    const post = await getPostBySlug(params.slug, [
         "title",
         "author",
         "content",
@@ -60,8 +60,8 @@ export async function generateMetadata({ params }: Props) {
 }
 
 export default async function BlogHead({ params }: Props) {
-    const posts = getAllPosts(["title", "date", "excerpt", "coverImage", "slug"]);
-    const post = getPostBySlug(params.slug, [
+    const posts = await getAllPosts(["title", "date", "excerpt", "coverImage", "slug"]);
+    const post = await getPostBySlug(params.slug, [
         "title",
         "author",
         "authorImage",
@@ -80,7 +80,7 @@ export default async function BlogHead({ params }: Props) {
                         <div className="col-span-8">
                             <div className="flex flex-col sm:flex-row">
                                 <span className="text-base text-midnight_text pr-7 border-r border-solid border-white w-fit">
-                                    {format(new Date(post.date), "dd MMM yyyy")}
+                                    {post.date ? format(new Date(post.date), "dd MMM yyyy") : ''}
                                 </span>
                                 <span className="text-base text-midnight_text sm:pl-7 pl-0 w-fit">13 Comments</span>
                             </div>
@@ -89,15 +89,17 @@ export default async function BlogHead({ params }: Props) {
                             </h2>
                         </div>
                         <div className="flex  gap-6 col-span-4 pt-4 md:pt-0">
-                            <Image
-                                src={post.authorImage}
-                                alt="image"
-                                className="rounded-full"
-                                width={84}
-                                height={84}
-                                quality={100}
-                                style={{ width: 'auto', height: 'auto' }}
-                            />
+                            {post.authorImage && (
+                                <Image
+                                    src={post.authorImage}
+                                    alt="image"
+                                    className="rounded-full"
+                                    width={84}
+                                    height={84}
+                                    quality={100}
+                                    style={{ width: 'auto', height: 'auto' }}
+                                />
+                            )}
                             <div>
                                 <span className="text-[22px] leading-[1.2] text-midnight_text">Silicaman</span>
                                 <p className="text-xl text-midnight_text">Author</p>

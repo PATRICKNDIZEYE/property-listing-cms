@@ -27,8 +27,12 @@ export default function AdminLogin() {
 
       if (result?.error) {
         toast.error('Invalid credentials');
+        setLoading(false);
         return;
       }
+
+      // Wait a bit for session to be set
+      await new Promise(resolve => setTimeout(resolve, 500));
 
       // Check if user is admin
       const response = await fetch('/api/auth/session');
@@ -36,14 +40,15 @@ export default function AdminLogin() {
 
       if (session?.user?.role !== 'ADMIN') {
         toast.error('Access denied. Admin privileges required.');
+        setLoading(false);
         return;
       }
 
       toast.success('Login successful');
+      router.refresh();
       router.push('/admin');
     } catch (error) {
       toast.error('Something went wrong');
-    } finally {
       setLoading(false);
     }
   };

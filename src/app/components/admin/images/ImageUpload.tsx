@@ -1,11 +1,14 @@
-'use client';
-
-import { useState } from 'react';
-import { Icon } from '@iconify/react';
-import toast from 'react-hot-toast';
+"use client";
+import { useState } from "react";
+import { Icon } from "@iconify/react";
+import toast from "react-hot-toast";
 
 interface ImageUploadProps {
-  onUploadSuccess?: (image: { id: string; url: string; filename: string }) => void;
+  onUploadSuccess?: (image: {
+    id: string;
+    url: string;
+    filename: string;
+  }) => void;
 }
 
 export default function ImageUpload({ onUploadSuccess }: ImageUploadProps) {
@@ -13,8 +16,8 @@ export default function ImageUpload({ onUploadSuccess }: ImageUploadProps) {
   const [dragActive, setDragActive] = useState(false);
 
   const handleFile = async (file: File) => {
-    if (!file.type.startsWith('image/')) {
-      toast.error('Please select an image file');
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please select an image file");
       return;
     }
 
@@ -22,25 +25,25 @@ export default function ImageUpload({ onUploadSuccess }: ImageUploadProps) {
 
     try {
       const formData = new FormData();
-      formData.append('file', file);
+      formData.append("file", file);
 
-      const response = await fetch('/api/admin/upload', {
-        method: 'POST',
+      const response = await fetch("/api/admin/upload", {
+        method: "POST",
         body: formData,
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        toast.success('Image uploaded successfully');
+        toast.success("Image uploaded successfully");
         if (onUploadSuccess) {
           onUploadSuccess(data.image);
         }
       } else {
-        toast.error(data.error || 'Failed to upload image');
+        toast.error(data.error || "Failed to upload image");
       }
     } catch (error) {
-      toast.error('Error uploading image');
+      toast.error("Error uploading image");
     } finally {
       setUploading(false);
     }
@@ -49,9 +52,9 @@ export default function ImageUpload({ onUploadSuccess }: ImageUploadProps) {
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (e.type === 'dragenter' || e.type === 'dragover') {
+    if (e.type === "dragenter" || e.type === "dragover") {
       setDragActive(true);
-    } else if (e.type === 'dragleave') {
+    } else if (e.type === "dragleave") {
       setDragActive(false);
     }
   };
@@ -81,8 +84,8 @@ export default function ImageUpload({ onUploadSuccess }: ImageUploadProps) {
       onDrop={handleDrop}
       className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
         dragActive
-          ? 'border-primary bg-primary/5'
-          : 'border-border dark:border-dark_border'
+          ? "border-primary bg-primary/5"
+          : "border-border dark:border-dark_border"
       }`}
     >
       <input
@@ -104,16 +107,14 @@ export default function ImageUpload({ onUploadSuccess }: ImageUploadProps) {
           className="text-primary"
         />
         <div>
-          <span className="text-primary font-medium">Click to upload</span> or drag and drop
+          <span className="text-primary font-medium">Click to upload</span> or
+          drag and drop
         </div>
         <div className="text-sm text-gray dark:text-gray">
           PNG, JPG, GIF, WebP up to 5MB
         </div>
-        {uploading && (
-          <div className="text-primary">Uploading...</div>
-        )}
+        {uploading && <div className="text-primary">Uploading...</div>}
       </label>
     </div>
   );
 }
-

@@ -2,8 +2,8 @@ import React from 'react';
 import { getAllPosts } from "@/utils/markdown";
 import BlogCard from '../../shared/blog/blogCard';
 
-const BlogList: React.FC = () => {
-    const posts = getAllPosts(["title", "date", "excerpt", "coverImage", "slug"]);
+const BlogList = async () => {
+    const posts = await getAllPosts(["title", "date", "excerpt", "coverImage", "slug"]);
 
     return (
         <section className="flex flex-wrap justify-center pt-8 lg:pb-24 pb-16 dark:bg-darkmode" id="blog">

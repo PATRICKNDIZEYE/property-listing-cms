@@ -7,10 +7,15 @@ export const metadata: Metadata = {
 
 export default function SettingsPage() {
   return (
-    <div>
-      <h1 className="text-3xl font-bold text-midnight_text dark:text-white mb-8">
-        Site Settings
-      </h1>
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold text-midnight_text dark:text-white">
+          Site Settings
+        </h1>
+        <p className="text-gray dark:text-gray mt-1">
+          Configure your website settings
+        </p>
+      </div>
       <SettingsForm />
     </div>
   );
