@@ -239,7 +239,7 @@ const Footer = () => {
                 </li>
                 <li>
                   <Link href="/properties/properties-list" className="mb-3 inline-block text-base text-gray hover:text-white">
-                    Properties
+                    Hillside Prime
                   </Link>
                 </li>
                 <li>

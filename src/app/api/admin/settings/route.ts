@@ -16,10 +16,10 @@ export async function GET() {
         data: {
           id: '1',
           siteTitle: 'Hillside Prime',
-          siteDescription: 'Your trusted property listing platform',
+          siteDescription: 'Your trusted Hillside Prime listing platform',
           headerMenu: [
             { label: 'Home', href: '/' },
-            { label: 'Properties', href: '/properties/properties-list' },
+            { label: 'Hillside Prime', href: '/properties/properties-list' },
             { label: 'Blogs', href: '/blogs' },
             { label: 'Contact', href: '/contact' },
           ],
@@ -51,7 +51,7 @@ export async function GET() {
             })
             .map((item: any) => {
               if (item.label === 'Properties' && item.submenu) {
-                return { label: 'Properties', href: '/properties/properties-list' };
+                return { label: 'Hillside Prime', href: '/properties/properties-list' };
               }
               if (item.label === 'Blogs' && item.submenu) {
                 return { label: 'Blogs', href: '/blogs' };

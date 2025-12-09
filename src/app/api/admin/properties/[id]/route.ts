@@ -170,13 +170,13 @@ export async function DELETE(
       where: { id: params.id },
     });
 
-    return NextResponse.json({ message: 'Property deleted successfully' });
+    return NextResponse.json({ message: 'Hillside Prime deleted successfully' });
   } catch (error: any) {
     if (error.message?.includes('Unauthorized')) {
       return NextResponse.json({ error: error.message }, { status: 401 });
     }
     return NextResponse.json({ 
-      error: error.message || 'Failed to delete property' 
+      error: error.message || 'Failed to delete Hillside Prime' 
     }, { status: 500 });
   }
 }

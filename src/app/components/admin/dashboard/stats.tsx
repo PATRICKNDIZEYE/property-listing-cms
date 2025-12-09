@@ -24,7 +24,7 @@ export default async function StatsCards() {
 
   const stats = [
     {
-      label: 'Total Properties',
+      label: 'Total Hillside Prime',
       value: propertyCount,
       icon: 'ion:home',
       color: 'bg-gradient-to-br from-blue-500 to-blue-600',
@@ -48,7 +48,7 @@ export default async function StatsCards() {
       bgColor: 'bg-purple-50 dark:bg-purple-900/20',
     },
     {
-      label: 'Featured Properties',
+      label: 'Featured Hillside Prime',
       value: featuredProperties,
       icon: 'ion:star',
       color: 'bg-gradient-to-br from-yellow-500 to-orange-500',

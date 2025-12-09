@@ -48,7 +48,7 @@ export default function AdminHeader({ sidebarCollapsed, toggleSidebar }: AdminHe
             className="flex items-center gap-2 px-3 py-2 bg-primary text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
           >
             <Icon icon="ion:add-outline" className="w-4 h-4" />
-            New Property
+            New Hillside Prime
           </Link>
           <Link
             href="/admin/blogs/new"

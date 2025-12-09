@@ -33,7 +33,7 @@ export default function AdvanceSearch({ category }: { category?: string }) {
 
     const breadcrumbLinks = [
         { href: "/", text: "Home" },
-        { href: "/properties/properties-list", text: "Property List" },
+        { href: "/properties/properties-list", text: "Hillside Prime List" },
     ];
 
 
@@ -81,7 +81,7 @@ export default function AdvanceSearch({ category }: { category?: string }) {
     return (
         <>
             <HeroSub
-                title={(filters?.category) ? filters?.category: "Properties List"}
+                title={(filters?.category) ? filters?.category: "Hillside Prime List"}
                 description="Letraset sheets containing Lorem Ipsum passages and more recently with desktop publishing Variou"
                 breadcrumbLinks={breadcrumbLinks}
             />

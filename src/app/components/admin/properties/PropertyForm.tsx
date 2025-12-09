@@ -219,14 +219,14 @@ export default function PropertyForm({ propertyId }: PropertyFormProps) {
             <Icon icon="ion:information-circle-outline" width={28} height={28} />
             Basic Information
           </h2>
-          <p className="text-blue-100 text-sm mt-1">Property title, price, and basic details</p>
+          <p className="text-blue-100 text-sm mt-1">Hillside Prime title, price, and basic details</p>
         </div>
 
         <div className="p-8 space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="md:col-span-2">
               <label className="block text-sm font-semibold text-midnight_text dark:text-white mb-2">
-                Property Title *
+                Hillside Prime Title *
               </label>
               <input
                 type="text"

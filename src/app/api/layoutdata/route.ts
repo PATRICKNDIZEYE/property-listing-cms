@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 // Fallback header data
 const fallbackHeaderData = [
   { label: "Home", href: "/" },
-  { label: "Properties", href: "/properties/properties-list" },
+  { label: "Hillside Prime", href: "/properties/properties-list" },
   { label: "Blogs", href: "/blogs" },
   { label: "Contact", href: "/contact" },
 ];
@@ -38,7 +38,7 @@ export const GET = async () => {
         .map((item: any) => {
           // Simplify Properties and Blogs to direct links if they have submenus
           if (item.label === 'Properties' && item.submenu) {
-            return { label: 'Properties', href: '/properties/properties-list' };
+            return { label: 'Hillside Prime', href: '/properties/properties-list' };
           }
           if (item.label === 'Blogs' && item.submenu) {
             return { label: 'Blogs', href: '/blogs' };

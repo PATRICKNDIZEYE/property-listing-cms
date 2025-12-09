@@ -28,7 +28,7 @@ const menuItems: MenuItem[] = [
     icon: 'ion:document-text-outline',
     children: [
       {
-        label: 'Properties',
+        label: 'Hillside Prime',
         href: '/admin/properties',
         icon: 'ion:home-outline',
         badge: '12',
@@ -77,7 +77,7 @@ const menuItems: MenuItem[] = [
         icon: 'ion:pie-chart-outline',
       },
       {
-        label: 'Property Views',
+        label: 'Hillside Prime Views',
         href: '/admin/analytics/properties',
         icon: 'ion:eye-outline',
       },
@@ -246,7 +246,7 @@ export default function AdminSidebar({ collapsed }: AdminSidebarProps) {
         <Link href="/admin" className="block">
           {!collapsed ? (
             <div>
-              <h1 className="text-xl font-bold text-white">Property CMS</h1>
+              <h1 className="text-xl font-bold text-white">Hillside Prime CMS</h1>
               <p className="text-blue-100 text-xs mt-1">Admin Portal</p>
             </div>
           ) : (

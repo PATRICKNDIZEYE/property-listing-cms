@@ -46,7 +46,7 @@ export default function PropertyList() {
   }, [page]);
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this property? This action cannot be undone.')) {
+    if (!confirm('Are you sure you want to delete this Hillside Prime? This action cannot be undone.')) {
       return;
     }
 
@@ -58,13 +58,13 @@ export default function PropertyList() {
       const data = await response.json();
 
       if (response.ok) {
-        toast.success('Property deleted successfully');
+        toast.success('Hillside Prime deleted successfully');
         fetchProperties();
       } else {
-        toast.error(data.error || 'Failed to delete property');
+        toast.error(data.error || 'Failed to delete Hillside Prime');
       }
     } catch (error: any) {
-      toast.error(error.message || 'Error deleting property');
+      toast.error(error.message || 'Error deleting Hillside Prime');
     }
   };
 

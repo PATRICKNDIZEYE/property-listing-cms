@@ -4,7 +4,7 @@ import { Icon } from '@iconify/react';
 import PropertyForm from '@/app/components/admin/properties/PropertyForm';
 
 export const metadata: Metadata = {
-  title: 'Edit Property',
+  title: 'Edit Hillside Prime',
 };
 
 export default function EditPropertyPage(props: any) {
@@ -20,10 +20,10 @@ export default function EditPropertyPage(props: any) {
         </Link>
         <div>
           <h1 className="text-3xl font-bold text-midnight_text dark:text-white">
-            Edit Property
+            Edit Hillside Prime
           </h1>
           <p className="text-gray dark:text-gray mt-1">
-            Update property information
+            Update Hillside Prime information
           </p>
         </div>
       </div>

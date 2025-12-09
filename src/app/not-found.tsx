@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 
 export const metadata: Metadata = {
-  title: "404 Page | Property-pro",
+  title: "404 Page | Hillside Prime",
 };
 
 const ErrorPage = () => {

@@ -100,10 +100,10 @@ export default function EnhancedPropertyList({ properties }: PropertyListProps) 
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
             <h2 className="text-xl font-bold text-midnight_text dark:text-white mb-1">
-              Properties Management
+              Hillside Prime Management
             </h2>
             <p className="text-sm text-gray dark:text-gray">
-              Manage all properties, listings, and property details
+              Manage all Hillside Prime, listings, and Hillside Prime details
             </p>
           </div>
           <Link
@@ -346,7 +346,7 @@ export default function EnhancedPropertyList({ properties }: PropertyListProps) 
                   </div>
                 </div>
 
-                {/* Property Details */}
+                {/* Hillside Prime Details */}
                 <div className="p-4">
                   <div className="flex items-start justify-between mb-2">
                     <h3 className="font-semibold text-midnight_text dark:text-white text-lg line-clamp-2">

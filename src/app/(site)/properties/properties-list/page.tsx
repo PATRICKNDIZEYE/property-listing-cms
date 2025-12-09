@@ -3,7 +3,7 @@ import { Metadata } from "next";
 import AdvanceSearch from '@/app/components/property-list/search';
 
 export const metadata: Metadata = {
-  title: "Properties List",
+  title: "Hillside Prime List",
 };
 
 interface Props {

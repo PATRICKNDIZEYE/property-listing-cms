@@ -68,11 +68,11 @@ export default async function RecentActivity() {
       </div>
 
       <div className="space-y-6">
-        {/* Recent Properties Section */}
+        {/* Recent Hillside Prime Section */}
         <div>
           <div className="flex items-center gap-2 mb-4">
             <Icon icon="ion:home-outline" className="w-5 h-5 text-blue-600" />
-            <h3 className="font-semibold text-midnight_text dark:text-white">Properties</h3>
+            <h3 className="font-semibold text-midnight_text dark:text-white">Hillside Prime</h3>
           </div>
           {recentProperties.length > 0 ? (
             <ul className="space-y-2">

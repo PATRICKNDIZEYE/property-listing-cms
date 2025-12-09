@@ -69,7 +69,7 @@ export default async function EnhancedStats() {
       trendIcon: 'ion:arrow-up-outline',
     },
     {
-      label: 'Featured Properties',
+      label: 'Featured Hillside Prime',
       value: featuredProperties,
       change: null,
       growth: null,
