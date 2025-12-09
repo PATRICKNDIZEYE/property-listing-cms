@@ -70,35 +70,40 @@ export default function HeroSliderManagement() {
 
       const uploadData = await uploadResponse.json();
 
-      if (uploadResponse.ok) {
-        const imageUrl = uploadData.image?.url || uploadData.url;
-        if (!imageUrl) {
-          toast.error('Invalid response from server');
-          return;
-        }
-
-        // Create hero slider
-        const createResponse = await fetch('/api/admin/hero-sliders', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            imageUrl,
-            section,
-            order: section === 'sell' ? sellSliders.length : buySliders.length,
-          }),
-        });
-
-        if (createResponse.ok) {
-          toast.success('Hero slider image uploaded successfully');
-          await fetchSliders();
-        } else {
-          const errorData = await createResponse.json();
-          toast.error(errorData.error || 'Failed to create hero slider');
-        }
-      } else {
+      if (!uploadResponse.ok) {
+        console.error('Upload failed:', uploadData);
         toast.error(uploadData.error || 'Failed to upload image');
+        return;
+      }
+
+      const imageUrl = uploadData.image?.url || uploadData.url;
+      if (!imageUrl) {
+        console.error('Invalid response:', uploadData);
+        toast.error('Invalid response from server');
+        return;
+      }
+
+      // Create hero slider
+      const createResponse = await fetch('/api/admin/hero-sliders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          imageUrl,
+          section,
+          order: section === 'sell' ? sellSliders.length : buySliders.length,
+        }),
+      });
+
+      if (createResponse.ok) {
+        toast.success('Hero slider image uploaded successfully');
+        await fetchSliders();
+      } else {
+        const errorData = await createResponse.json();
+        console.error('Create slider failed:', errorData);
+        toast.error(errorData.error || 'Failed to create hero slider');
       }
     } catch (error: any) {
+      console.error('Upload error:', error);
       toast.error(error.message || 'Error uploading image');
     } finally {
       setUploading(null);

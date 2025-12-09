@@ -47,7 +47,7 @@ export default function History() {
               </div>
               <div>
                 <Image
-                  src="/images/history/logo.svg"
+                  src="/images/history/logo.png"
                   alt="company"
                   width={93}
                   height={130}

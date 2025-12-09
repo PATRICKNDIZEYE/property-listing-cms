@@ -58,7 +58,7 @@ const Footer = () => {
                 />
               ) : (
                 <Image
-                  src="/images/logo/logo-white.svg"
+                  src="/images/logo/logo.png"
                   alt="Hillside Prime"
                   width={200}
                   height={60}

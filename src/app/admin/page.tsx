@@ -3,7 +3,6 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth-config';
 import EnhancedStats from '@/app/components/admin/dashboard/EnhancedStats';
 import RecentActivity from '@/app/components/admin/dashboard/recent-activity';
-import QuickActions from '@/app/components/admin/dashboard/quick-actions';
 import Link from 'next/link';
 import { Icon } from '@iconify/react';
 

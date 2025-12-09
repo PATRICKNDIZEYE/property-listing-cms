@@ -9,7 +9,7 @@ export const LogoConfiguration = () => {
                     <div className="text-sm text-lightgray">
                     <p>&#x3C;Link href=&#x22;/&#x22;&#x3E;</p>
   <p className="ms-2">&#x3C;Image</p>
-    <p className="ms-3">src=&#x22;/images/logo/logo.svg&#x22;</p>
+    <p className="ms-3">src=&#x22;/images/logo/logo.png&#x22;</p>
     <p className="ms-3">alt=&#x22;logo&#x22;</p>
     <p className="ms-3">width={160}</p>
     <p className="ms-3">height={50}</p>
@@ -17,7 +17,7 @@ export const LogoConfiguration = () => {
     <p className="ms-3">className=&#x27;dark:hidden&#x27;</p>
   <p>/&#x3E;</p>
   <p className="ms-2">&#x3C;Image</p>
-    <p className="ms-5">src=&#x22;/images/footer/footer-logo-white.svg&#x22;</p>
+    <p className="ms-5">src=&#x22;/images/footer/footer-logo.png&#x22;</p>
     <p className="ms-5">alt=&#x22;logo&#x22;</p>
     <p className="ms-5">width={160}</p>
     <p className="ms-5">height={50}</p>

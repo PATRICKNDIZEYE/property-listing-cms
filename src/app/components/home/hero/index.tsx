@@ -81,18 +81,34 @@ const Hero = () => {
     }
   };
 
+  const currentSliders = activeTab === 'sell' ? sellSliders : buySliders;
+
+  // Reset slider when sliders change or tab changes
+  useEffect(() => {
+    if (sliderRef.current && currentSliders.length > 0) {
+      // Small delay to ensure slider is ready
+      setTimeout(() => {
+        if (sliderRef.current) {
+          sliderRef.current.slickGoTo(0);
+        }
+      }, 100);
+    }
+  }, [currentSliders.length, activeTab]);
+
   const sliderSettings = {
     dots: false,
-    infinite: true,
+    infinite: currentSliders.length > 1,
     speed: 1500,
     slidesToShow: 1,
     slidesToScroll: 1,
-    autoplay: true,
+    autoplay: currentSliders.length > 1,
     autoplaySpeed: 5000,
     fade: true,
     cssEase: 'linear',
     arrows: false,
     pauseOnHover: false,
+    adaptiveHeight: false,
+    lazyLoad: 'ondemand' as const,
   };
 
   const handleSearchSell = () => {
@@ -124,24 +140,27 @@ const Hero = () => {
     setShowSuggestions(false);
   };
 
-  const currentSliders = activeTab === 'sell' ? sellSliders : buySliders;
-
   return (
     <section className="relative pt-44 pb-0 dark:bg-darklight overflow-x-hidden min-h-[600px]">
       {/* Background Slider */}
       {currentSliders.length > 0 && (
-        <div className="absolute inset-0 z-0 w-full" style={{ height: '100%' }}>
-          <Slider ref={sliderRef} {...sliderSettings} style={{ height: '100%' }}>
-            {currentSliders.map((slider) => (
-              <div key={slider.id} style={{ height: '100%', width: '100%', position: 'relative' }}>
+        <div className="absolute inset-0 z-0 w-full h-full">
+          <Slider 
+            key={`slider-${activeTab}-${currentSliders.length}-${currentSliders.map(s => s.id).join('-')}`}
+            ref={sliderRef} 
+            {...sliderSettings}
+          >
+            {currentSliders.map((slider, index) => (
+              <div key={slider.id} className="h-full w-full relative">
                 <div className="absolute inset-0 bg-gradient-to-b from-white/90 from-10% dark:from-darkmode/90 to-herobg/90 to-90% dark:to-darklight/90 z-10 pointer-events-none"></div>
                 <Image
                   src={slider.imageUrl}
                   alt={`Hero background ${slider.order + 1}`}
                   fill
                   className="object-cover"
-                  priority={slider.order === 0}
-                  quality={85}
+                  priority={index === 0}
+                  quality={90}
+                  unoptimized={false}
                 />
               </div>
             ))}

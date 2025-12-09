@@ -19,27 +19,68 @@ export async function GET() {
           siteDescription: 'Your trusted property listing platform',
           headerMenu: [
             { label: 'Home', href: '/' },
-            {
-              label: 'Properties',
-              href: '#',
-              submenu: [
-                { label: 'Property List', href: '/properties/properties-list' },
-                { label: 'Property Details', href: '/properties/properties-list/modern-apartment' },
-              ],
-            },
-            {
-              label: 'Blogs',
-              href: '#',
-              submenu: [
-                { label: 'Blog Grid', href: '/blogs' },
-                { label: 'Blog Details', href: '/blogs/blog_1' },
-              ],
-            },
+            { label: 'Properties', href: '/properties/properties-list' },
+            { label: 'Blogs', href: '/blogs' },
             { label: 'Contact', href: '/contact' },
-            { label: 'Documentation', href: '/documentation' },
           ],
         },
       });
+    } else {
+      // Clean up menu if it contains documentation or template items
+      const currentMenu = settings.headerMenu as any[];
+      if (currentMenu && Array.isArray(currentMenu)) {
+        const hasDocumentation = currentMenu.some((item: any) => 
+          item.label?.toLowerCase() === 'documentation' || 
+          item.href?.toLowerCase() === '/documentation' ||
+          item.href?.includes('modern-apartment') ||
+          item.href?.includes('blog_1')
+        );
+
+        if (hasDocumentation) {
+          const cleanedMenu = currentMenu
+            .filter((item: any) => {
+              if (item.label?.toLowerCase() === 'documentation' || 
+                  item.href?.toLowerCase() === '/documentation') {
+                return false;
+              }
+              if (item.href?.includes('modern-apartment') || 
+                  item.href?.includes('blog_1')) {
+                return false;
+              }
+              return true;
+            })
+            .map((item: any) => {
+              if (item.label === 'Properties' && item.submenu) {
+                return { label: 'Properties', href: '/properties/properties-list' };
+              }
+              if (item.label === 'Blogs' && item.submenu) {
+                return { label: 'Blogs', href: '/blogs' };
+              }
+              if (item.submenu && Array.isArray(item.submenu)) {
+                const cleanedSubmenu = item.submenu.filter((subItem: any) => {
+                  return !subItem.href?.includes('modern-apartment') && 
+                         !subItem.href?.includes('blog_1') &&
+                         subItem.label?.toLowerCase() !== 'documentation';
+                });
+                if (cleanedSubmenu.length <= 1) {
+                  return cleanedSubmenu.length === 1 
+                    ? { label: item.label, href: cleanedSubmenu[0].href }
+                    : { label: item.label, href: item.href === '#' ? '/' : item.href };
+                }
+                return { ...item, submenu: cleanedSubmenu };
+              }
+              return item;
+            });
+
+          // Update database with cleaned menu
+          settings = await prisma.siteSettings.update({
+            where: { id: '1' },
+            data: {
+              headerMenu: cleanedMenu,
+            },
+          });
+        }
+      }
     }
 
     return NextResponse.json(settings);

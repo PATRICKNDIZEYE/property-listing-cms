@@ -21,12 +21,7 @@ const Header: React.FC = () => {
   const [user, setUser] = useState<{ user: any } | null>(null);
   const [navbarOpen, setNavbarOpen] = useState(false);
   const [sticky, setSticky] = useState(false);
-  const [isSignInOpen, setIsSignInOpen] = useState(false);
-  const [isSignUpOpen, setIsSignUpOpen] = useState(false);
 
-  const navbarRef = useRef<HTMLDivElement>(null);
-  const signInRef = useRef<HTMLDivElement>(null);
-  const signUpRef = useRef<HTMLDivElement>(null);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
 
   // Function to handle scroll to set sticky class
@@ -34,14 +29,8 @@ const Header: React.FC = () => {
     setSticky(window.scrollY >= 80);
   };
 
-  // Function to handle click outside
+  // Function to handle click outside mobile menu
   const handleClickOutside = (event: MouseEvent) => {
-    if (signInRef.current && !signInRef.current.contains(event.target as Node)) {
-      setIsSignInOpen(false);
-    }
-    if (signUpRef.current && !signUpRef.current.contains(event.target as Node)) {
-      setIsSignUpOpen(false);
-    }
     if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target as Node) && navbarOpen) {
       setNavbarOpen(false);
     }
@@ -54,10 +43,9 @@ const Header: React.FC = () => {
       window.removeEventListener("scroll", handleScroll);
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [navbarOpen, isSignInOpen, isSignUpOpen]);
+  }, [navbarOpen]);
 
   useEffect(() => {
-    window.addEventListener("scroll", handleScroll);
     // Only use localStorage user if no session exists
     if (!session?.user) {
       const storedUser = localStorage.getItem("user");
@@ -70,9 +58,6 @@ const Header: React.FC = () => {
       // Clear localStorage user when session exists
       setUser(null);
     }
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
   }, [pathUrl, session]);
 
   useEffect(() => {
@@ -84,7 +69,7 @@ const Header: React.FC = () => {
         const data = await res.json()
         setData(data?.headerData || [])
       } catch (error) {
-        console.error('Error fetching services:', error)
+        console.error('Error fetching header menu:', error)
       }
     }
 

@@ -33,7 +33,7 @@ export default function Details() {
 
   const breadcrumbLinks = [
     { href: "/", text: "Home" },
-    { href: "/property-list", text: "Property Details" },
+    { href: "/properties/properties-list", text: "Properties List" },
   ];
   return (
     <div>
