@@ -39,10 +39,18 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error: any) {
-    if (error.message.includes('Unauthorized')) {
+    if (error.message?.includes('Unauthorized')) {
       return NextResponse.json({ error: error.message }, { status: 401 });
     }
-    return NextResponse.json({ error: error.message || 'Failed to upload image' }, { status: 500 });
+    if (error.message?.includes('Invalid image type')) {
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
+    if (error.message?.includes('size exceeds')) {
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
+    return NextResponse.json({ 
+      error: error.message || 'Failed to upload image' 
+    }, { status: 500 });
   }
 }
 
@@ -82,10 +90,12 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error: any) {
-    if (error.message.includes('Unauthorized')) {
+    if (error.message?.includes('Unauthorized')) {
       return NextResponse.json({ error: error.message }, { status: 401 });
     }
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ 
+      error: error.message || 'Failed to fetch images' 
+    }, { status: 500 });
   }
 }
 

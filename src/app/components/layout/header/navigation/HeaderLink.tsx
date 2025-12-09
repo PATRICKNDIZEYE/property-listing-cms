@@ -34,7 +34,7 @@ const HeaderLink: React.FC<{ item: HeaderItem }> = ({ item }) => {
       {submenuOpen && (
         <div className={`absolute py-2 top-9 left-0 mt-0.5 w-60 bg-white dark:bg-darkmode shadow-lg dark:shadow-darkmd rounded-lg `} data-aos="fade-up" data-aos-duration="300">
           {item.submenu?.map((subItem, index) => (
-            <Link key={index} href={subItem.href} className={`block px-4 py-2  ${path === subItem.href ? 'text-white bg-primary hover:bg-blue-700' : ' text-midnight_text dark:text-white hover:bg-section dark:hover:bg-semidark'}`}>
+            <Link key={index} href={subItem.href} className={`block px-4 py-2  ${path === subItem.href ? 'text-white bg-primary hover:bg-darkGreen' : ' text-midnight_text dark:text-white hover:bg-section dark:hover:bg-semidark'}`}>
               {subItem.label}
             </Link>
           ))}

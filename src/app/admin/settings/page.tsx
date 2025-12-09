@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import InfoManagement from '@/app/components/admin/settings/InfoManagement';
+import HeroSliderManagement from '@/app/components/admin/settings/HeroSliderManagement';
 
 export const metadata: Metadata = {
   title: 'Site Settings',
@@ -17,6 +18,7 @@ export default function SettingsPage() {
         </p>
       </div>
       <InfoManagement />
+      <HeroSliderManagement />
     </div>
   );
 }

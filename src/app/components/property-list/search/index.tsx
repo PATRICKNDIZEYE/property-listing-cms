@@ -89,7 +89,7 @@ export default function AdvanceSearch({ category }: { category?: string }) {
                 <div className='lg:max-w-screen-xl max-w-screen-md mx-auto'>
                     <div className='flex lg:hidden justify-between items-center mb-4'>
                         <span className='text-2xl ml-4 '>Advance Filter</span>
-                        <button onClick={toggleOffCanvas} className='bg-blue-500 mr-4 text-white py-3 px-6 text-base rounded-lg'>
+                        <button onClick={toggleOffCanvas} className='bg-primary mr-4 text-white py-3 px-6 text-base rounded-lg hover:bg-darkGreen'>
                             <svg xmlns="http://www.w3.org/2000/svg" className='w-6 h-6' viewBox="0 0 24 24">
                                 <path fill="none" stroke="currentColor" strokeLinecap="round" strokeMiterlimit="10" strokeWidth="1.5" d="M21.25 12H8.895m-4.361 0H2.75m18.5 6.607h-5.748m-4.361 0H2.75m18.5-13.214h-3.105m-4.361 0H2.75m13.214 2.18a2.18 2.18 0 1 0 0-4.36a2.18 2.18 0 0 0 0 4.36Zm-9.25 6.607a2.18 2.18 0 1 0 0-4.36a2.18 2.18 0 0 0 0 4.36Zm6.607 6.608a2.18 2.18 0 1 0 0-4.361a2.18 2.18 0 0 0 0 4.36Z" />
                             </svg>
@@ -187,7 +187,7 @@ export default function AdvanceSearch({ category }: { category?: string }) {
 
                                     {/* Example button */}
                                     <div>
-                                        <button className='bg-blue-500 text-white w-full py-3 px-6 text-base rounded-lg'>
+                                        <button className='bg-primary hover:bg-darkGreen text-white w-full py-3 px-6 text-base rounded-lg'>
                                             Find Property
                                         </button>
                                     </div>
@@ -247,7 +247,7 @@ export default function AdvanceSearch({ category }: { category?: string }) {
 
                                     {/* Example button */}
                                     <div>
-                                        <button className='bg-primary hover:bg-blue-700 text-white w-full py-3 px-6 text-base rounded-lg'>
+                                        <button className='bg-primary hover:bg-darkGreen text-white w-full py-3 px-6 text-base rounded-lg'>
                                             Find Property
                                         </button>
                                     </div>

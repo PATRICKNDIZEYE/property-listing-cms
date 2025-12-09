@@ -21,7 +21,7 @@ const [data, setData] = useState<any[]>([]);
         }, [])
 
     return (
-        <section className='py-[120px] bg-[#2F73F2]'>
+        <section className='py-[120px] bg-primary'>
             <div className="max-w-[1200px] mx-auto px-4">
                 <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                     {data.map((property, index) => (

@@ -144,7 +144,7 @@ const ContactForm = () => {
                   </div>
                 </div>
                 <div className="mx-0 my-2.5 w-full">
-                  <button type="submit" className="bg-primary rounded-lg text-white py-4 px-8 mt-4 inline-block hover:bg-blue-700">
+                  <button type="submit" className="bg-primary rounded-lg text-white py-4 px-8 mt-4 inline-block hover:bg-darkGreen">
                     Make an appointment
                   </button>
                 </div>

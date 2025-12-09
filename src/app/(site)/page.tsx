@@ -10,7 +10,7 @@ import DiscoverProperties from "../../app/components/home/property-option";
 import Listing from "../../app/components/home/property-list";
 import Testimonials from "../../app/components/home/testimonial";
 export const metadata: Metadata = {
-  title: "Property",
+  title: "Hillside Prime",
 };
 
 export default function Home() {

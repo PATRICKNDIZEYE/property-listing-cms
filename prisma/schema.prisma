@@ -133,7 +133,7 @@ model Image {
 
 model SiteSettings {
   id              String   @id @default(cuid())
-  siteTitle       String   @default("Property")
+  siteTitle       String   @default("Hillside Prime")
   siteDescription String?  @db.Text
   siteLogo        String?
   contactEmail    String?
@@ -165,5 +165,16 @@ model Analytics {
   createdAt   DateTime @default(now())
 
   @@map("analytics")
+}
+
+model HeroSlider {
+  id          String   @id @default(cuid())
+  imageUrl    String
+  section     String   // 'sell' or 'buy'
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("hero_sliders")
 }
 

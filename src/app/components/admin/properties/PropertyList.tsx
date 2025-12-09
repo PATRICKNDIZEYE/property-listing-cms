@@ -46,7 +46,7 @@ export default function PropertyList() {
   }, [page]);
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this property?')) {
+    if (!confirm('Are you sure you want to delete this property? This action cannot be undone.')) {
       return;
     }
 
@@ -55,14 +55,16 @@ export default function PropertyList() {
         method: 'DELETE',
       });
 
+      const data = await response.json();
+
       if (response.ok) {
         toast.success('Property deleted successfully');
         fetchProperties();
       } else {
-        toast.error('Failed to delete property');
+        toast.error(data.error || 'Failed to delete property');
       }
-    } catch (error) {
-      toast.error('Error deleting property');
+    } catch (error: any) {
+      toast.error(error.message || 'Error deleting property');
     }
   };
 

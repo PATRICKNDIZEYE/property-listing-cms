@@ -30,8 +30,13 @@ export async function saveImage(file: File, folder: string = 'uploads'): Promise
   const filename = `${timestamp}-${randomString}.${extension}`;
   const filepath = join(uploadDir, filename);
 
-  // Optimize and save image
-  if (file.type === 'image/png') {
+  // Handle GIF files separately - Sharp doesn't preserve animation
+  // Save GIF files directly without processing to preserve animation
+  if (file.type === 'image/gif') {
+    await writeFile(filepath, buffer);
+  } 
+  // Optimize and save other image formats
+  else if (file.type === 'image/png') {
     await sharp(buffer)
       .resize(1920, 1920, { fit: 'inside', withoutEnlargement: true })
       .png({ quality: 85 })
@@ -42,6 +47,7 @@ export async function saveImage(file: File, folder: string = 'uploads'): Promise
       .webp({ quality: 85 })
       .toFile(filepath);
   } else {
+    // JPEG and other formats
     await sharp(buffer)
       .resize(1920, 1920, { fit: 'inside', withoutEnlargement: true })
       .jpeg({ quality: 85 })

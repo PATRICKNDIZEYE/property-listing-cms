@@ -1,9 +1,17 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useContext } from 'react';
 import { PropertyContext } from "@/context-api/PropertyContext";
+import Slider from "react-slick";
+
+interface HeroSlider {
+  id: string;
+  imageUrl: string;
+  section: 'sell' | 'buy';
+  order: number;
+}
 
 const Hero = () => {
   const router = useRouter();
@@ -13,6 +21,9 @@ const Hero = () => {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [location, setLocation] = useState("");
   const [error, setError] = useState('');
+  const [sellSliders, setSellSliders] = useState<HeroSlider[]>([]);
+  const [buySliders, setBuySliders] = useState<HeroSlider[]>([]);
+  const sliderRef = useRef<Slider>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -30,8 +41,58 @@ const Hero = () => {
     fetchData()
   }, [])
 
+  useEffect(() => {
+    const fetchSliders = async () => {
+      try {
+        const [sellResponse, buyResponse] = await Promise.all([
+          fetch('/api/hero-sliders?section=sell'),
+          fetch('/api/hero-sliders?section=buy'),
+        ]);
+
+        if (sellResponse.ok) {
+          const sellData = await sellResponse.json();
+          setSellSliders(sellData.sliders || []);
+        } else {
+          setSellSliders([]);
+        }
+
+        if (buyResponse.ok) {
+          const buyData = await buyResponse.json();
+          setBuySliders(buyData.sliders || []);
+        } else {
+          setBuySliders([]);
+        }
+      } catch (error) {
+        console.error('Error fetching hero sliders:', error);
+        // Set empty arrays on error to show fallback gradient
+        setSellSliders([]);
+        setBuySliders([]);
+      }
+    };
+
+    fetchSliders();
+  }, [])
+
   const handleTabChange = (tab: any) => {
     setActiveTab(tab);
+    // Reset slider to first slide when tab changes
+    if (sliderRef.current) {
+      sliderRef.current.slickGoTo(0);
+    }
+  };
+
+  const sliderSettings = {
+    dots: false,
+    infinite: true,
+    speed: 1500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    autoplay: true,
+    autoplaySpeed: 5000,
+    fade: true,
+    cssEase: 'linear',
+    arrows: false,
+    pauseOnHover: false,
   };
 
   const handleSearchSell = () => {
@@ -63,8 +124,36 @@ const Hero = () => {
     setShowSuggestions(false);
   };
 
+  const currentSliders = activeTab === 'sell' ? sellSliders : buySliders;
+
   return (
-    <section className="relative pt-44 pb-0 dark:bg-darklight bg-no-repeat bg-gradient-to-b from-white from-10% dark:from-darkmode to-herobg to-90% dark:to-darklight overflow-x-hidden">
+    <section className="relative pt-44 pb-0 dark:bg-darklight overflow-x-hidden min-h-[600px]">
+      {/* Background Slider */}
+      {currentSliders.length > 0 && (
+        <div className="absolute inset-0 z-0 w-full" style={{ height: '100%' }}>
+          <Slider ref={sliderRef} {...sliderSettings} style={{ height: '100%' }}>
+            {currentSliders.map((slider) => (
+              <div key={slider.id} style={{ height: '100%', width: '100%', position: 'relative' }}>
+                <div className="absolute inset-0 bg-gradient-to-b from-white/90 from-10% dark:from-darkmode/90 to-herobg/90 to-90% dark:to-darklight/90 z-10 pointer-events-none"></div>
+                <Image
+                  src={slider.imageUrl}
+                  alt={`Hero background ${slider.order + 1}`}
+                  fill
+                  className="object-cover"
+                  priority={slider.order === 0}
+                  quality={85}
+                />
+              </div>
+            ))}
+          </Slider>
+        </div>
+      )}
+      
+      {/* Fallback gradient background if no sliders */}
+      {currentSliders.length === 0 && (
+        <div className="absolute inset-0 z-0 bg-gradient-to-b from-white from-10% dark:from-darkmode to-herobg to-90% dark:to-darklight"></div>
+      )}
+
       <div className="container mx-auto lg:max-w-screen-xl md:max-w-screen-md relative z-10">
         <div className="grid lg:grid-cols-12 grid-cols-1">
           <div
@@ -139,10 +228,10 @@ const Hero = () => {
                     </div>
                     <div className="mt-6 flex flex-col-reverse gap-4 md:justify-between">
                       <div className="flex flex-col md:flex-row md:gap-4 w-full">
-                        <button onClick={handleSearchSell} className="flex-1 py-2 md:py-4 text-lg md:text-xl px-4 md:px-8 bg-primary text-white rounded-lg hover:bg-blue-700 transition duration-300 mb-2 md:mb-0 md:mr-2">
+                        <button onClick={handleSearchSell} className="flex-1 py-2 md:py-4 text-lg md:text-xl px-4 md:px-8 bg-primary text-white rounded-lg hover:bg-darkGreen transition duration-300 mb-2 md:mb-0 md:mr-2">
                           Search
                         </button>
-                        <button onClick={handleSearchSell} className="flex-1 py-2 md:py-4 text-lg md:text-xl px-4 md:px-8 bg-skyBlue/80 dark:bg-skyBlue/80 dark:hover:bg-skyBlue dark:hover:border-primary border border-transparent text-white rounded-lg hover:bg-skyBlue transition duration-300 text-nowrap">
+                        <button onClick={handleSearchSell} className="flex-1 py-2 md:py-4 text-lg md:text-xl px-4 md:px-8 bg-primary/80 dark:bg-primary/80 dark:hover:bg-primary dark:hover:border-primary border border-transparent text-white rounded-lg hover:bg-primary transition duration-300 text-nowrap">
                           Advance Search
                         </button>
                       </div>
@@ -192,10 +281,10 @@ const Hero = () => {
                     </div>
                     <div className="mt-6 flex flex-col-reverse gap-4 md:justify-between">
                       <div className="flex flex-col md:flex-row md:gap-4 w-full">
-                        <button onClick={handleSearchBuy} className="flex-1 py-2 md:py-4 text-lg md:text-xl px-4 md:px-8 bg-primary text-white rounded-lg hover:bg-blue-700 transition duration-300 mb-2 md:mb-0 md:mr-2">
+                        <button onClick={handleSearchBuy} className="flex-1 py-2 md:py-4 text-lg md:text-xl px-4 md:px-8 bg-primary text-white rounded-lg hover:bg-darkGreen transition duration-300 mb-2 md:mb-0 md:mr-2">
                           Search
                         </button>
-                        <button onClick={handleSearchBuy} className="flex-1 py-2 md:py-4 text-lg md:text-xl px-4 md:px-8 bg-skyBlue/80 dark:bg-skyBlue/80 dark:hover:bg-skyBlue dark:hover:border-primary border border-transparent text-white rounded-lg hover:bg-skyBlue transition duration-300 text-nowrap">
+                        <button onClick={handleSearchBuy} className="flex-1 py-2 md:py-4 text-lg md:text-xl px-4 md:px-8 bg-primary/80 dark:bg-primary/80 dark:hover:bg-primary dark:hover:border-primary border border-transparent text-white rounded-lg hover:bg-primary transition duration-300 text-nowrap">
                           Advance Search
                         </button>
                       </div>
@@ -210,35 +299,35 @@ const Hero = () => {
             <div className="flex flex-col justify-start ml-4 mt-8 mb-12 gap-3">
               <div className="flex space-x-2" data-aos="fade-left">
                 <svg
-                  className="w-6 h-6 text-blue-500"
+                  className="w-6 h-6 text-primary"
                   fill="currentColor"
                   viewBox="0 0 24 24"
                 >
                   <path d="M12 .587l3.668 7.431L24 9.763l-6 5.847L19.336 24 12 20.019 4.664 24 6 15.61 0 9.763l8.332-1.745z" />
                 </svg>
                 <svg
-                  className="w-6 h-6 text-blue-500"
+                  className="w-6 h-6 text-primary"
                   fill="currentColor"
                   viewBox="0 0 24 24"
                 >
                   <path d="M12 .587l3.668 7.431L24 9.763l-6 5.847L19.336 24 12 20.019 4.664 24 6 15.61 0 9.763l8.332-1.745z" />
                 </svg>
                 <svg
-                  className="w-6 h-6 text-blue-500"
+                  className="w-6 h-6 text-primary"
                   fill="currentColor"
                   viewBox="0 0 24 24"
                 >
                   <path d="M12 .587l3.668 7.431L24 9.763l-6 5.847L19.336 24 12 20.019 4.664 24 6 15.61 0 9.763l8.332-1.745z" />
                 </svg>
                 <svg
-                  className="w-6 h-6 text-blue-500"
+                  className="w-6 h-6 text-primary"
                   fill="currentColor"
                   viewBox="0 0 24 24"
                 >
                   <path d="M12 .587l3.668 7.431L24 9.763l-6 5.847L19.336 24 12 20.019 4.664 24 6 15.61 0 9.763l8.332-1.745z" />
                 </svg>
                 <svg
-                  className="w-6 h-6 text-blue-500"
+                  className="w-6 h-6 text-primary"
                   fill="currentColor"
                   viewBox="0 0 24 24"
                 >

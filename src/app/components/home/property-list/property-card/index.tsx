@@ -37,7 +37,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, viewMode }) => {
             viewBox="0 0 24 24"
             width="38"
             height="38"
-            fill="#2F73F2"
+            fill="#19B57B"
           >
             <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
           </svg>
@@ -56,7 +56,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, viewMode }) => {
               <div className="font-bold text-2xl group-hover:text-primary text-midnight_text dark:text-white">
                 {property.property_price}
               </div>
-              <div className="text-xs bg-[#DAE7FF] dark:bg-white text-midnight_text dark:text-primary py-1 px-2 rounded-lg font-bold">
+              <div className="text-xs bg-herobg dark:bg-white text-midnight_text dark:text-primary py-1 px-2 rounded-lg font-bold">
                 {property.location}
               </div>
             </div>

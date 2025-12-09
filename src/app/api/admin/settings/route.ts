@@ -15,7 +15,7 @@ export async function GET() {
       settings = await prisma.siteSettings.create({
         data: {
           id: '1',
-          siteTitle: 'Property',
+          siteTitle: 'Hillside Prime',
           siteDescription: 'Your trusted property listing platform',
           headerMenu: [
             { label: 'Home', href: '/' },
@@ -44,10 +44,12 @@ export async function GET() {
 
     return NextResponse.json(settings);
   } catch (error: any) {
-    if (error.message.includes('Unauthorized')) {
+    if (error.message?.includes('Unauthorized')) {
       return NextResponse.json({ error: error.message }, { status: 401 });
     }
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ 
+      error: error.message || 'Failed to fetch settings' 
+    }, { status: 500 });
   }
 }
 
@@ -95,7 +97,7 @@ export async function PUT(request: NextRequest) {
       },
       create: {
         id: '1',
-        siteTitle: siteTitle || 'Property',
+        siteTitle: siteTitle || 'Hillside Prime',
         siteDescription,
         siteLogo,
         contactEmail,
@@ -115,10 +117,12 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json(settings);
   } catch (error: any) {
-    if (error.message.includes('Unauthorized')) {
+    if (error.message?.includes('Unauthorized')) {
       return NextResponse.json({ error: error.message }, { status: 401 });
     }
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ 
+      error: error.message || 'Failed to fetch settings' 
+    }, { status: 500 });
   }
 }
 

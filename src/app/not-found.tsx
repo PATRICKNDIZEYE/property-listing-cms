@@ -78,7 +78,7 @@ const ErrorPage = () => {
                 </p>
                 <Link
                   href="/"
-                  className="rounded-md px-7 py-3 text-base font-medium text-white transition hover:bg-blue-700 bg-primary"
+                  className="rounded-md px-7 py-3 text-base font-medium text-white transition hover:bg-darkGreen bg-primary"
                 >
                   Go To Home
                 </Link>

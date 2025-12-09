@@ -93,14 +93,17 @@ export default function SettingsForm() {
         body: JSON.stringify(formData),
       });
 
+      const data = await response.json();
+      
       if (response.ok) {
         toast.success('Settings saved successfully');
+        // Refresh settings to ensure everything is in sync
+        fetchSettings();
       } else {
-        const error = await response.json();
-        toast.error(error.error || 'Failed to save settings');
+        toast.error(data.error || 'Failed to save settings');
       }
-    } catch (error) {
-      toast.error('Error saving settings');
+    } catch (error: any) {
+      toast.error(error.message || 'Error saving settings');
     } finally {
       setLoading(false);
     }

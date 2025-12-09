@@ -1,5 +1,7 @@
 import { DM_Sans } from "next/font/google";
 import "./globals.css";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 import { ThemeProvider } from "next-themes";
 import Aoscompo from "@/utils/aos";
 const dmsans = DM_Sans({ subsets: ["latin"] });

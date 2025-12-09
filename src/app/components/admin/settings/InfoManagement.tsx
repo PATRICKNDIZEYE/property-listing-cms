@@ -97,19 +97,25 @@ export default function InfoManagement() {
         body: uploadFormData,
       });
 
+      const data = await response.json();
+      
       if (response.ok) {
-        const { url } = await response.json();
+        const imageUrl = data.image?.url || data.url;
+        if (!imageUrl) {
+          toast.error('Invalid response from server');
+          return;
+        }
         setFormData((prev) => ({
           ...prev,
-          siteLogo: url,
+          siteLogo: imageUrl,
         }));
-        setLogoPreview(url);
+        setLogoPreview(imageUrl);
         toast.success('Logo uploaded successfully');
       } else {
-        toast.error('Failed to upload logo');
+        toast.error(data.error || 'Failed to upload logo');
       }
-    } catch (error) {
-      toast.error('Error uploading logo');
+    } catch (error: any) {
+      toast.error(error.message || 'Error uploading logo');
     } finally {
       setUploading(false);
     }
@@ -128,14 +134,17 @@ export default function InfoManagement() {
         body: JSON.stringify(formData),
       });
 
+      const data = await response.json();
+      
       if (response.ok) {
-        toast.success('Information updated successfully');
+        toast.success('Information updated successfully! Changes are now live on the site.');
+        // Refresh settings to ensure everything is in sync
+        fetchSettings();
       } else {
-        const error = await response.json();
-        toast.error(error.error || 'Failed to save information');
+        toast.error(data.error || 'Failed to save information');
       }
-    } catch (error) {
-      toast.error('Error saving information');
+    } catch (error: any) {
+      toast.error(error.message || 'Error saving information');
     } finally {
       setLoading(false);
     }

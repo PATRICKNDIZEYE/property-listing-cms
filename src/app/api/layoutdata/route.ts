@@ -34,14 +34,35 @@ export const GET = async () => {
       ? (settings.headerMenu as typeof fallbackHeaderData)
       : fallbackHeaderData;
 
+    // Return all public settings (no authentication required)
     return NextResponse.json({
-      headerData
+      headerData,
+      siteLogo: settings?.siteLogo || null,
+      siteTitle: settings?.siteTitle || 'Hillside Prime',
+      siteDescription: settings?.siteDescription || null,
+      contactEmail: settings?.contactEmail || null,
+      contactPhone: settings?.contactPhone || null,
+      contactAddress: settings?.contactAddress || null,
+      facebookUrl: settings?.facebookUrl || null,
+      twitterUrl: settings?.twitterUrl || null,
+      instagramUrl: settings?.instagramUrl || null,
+      linkedinUrl: settings?.linkedinUrl || null,
     });
   } catch (error) {
     // Fallback to static data if database is not available
     console.error('Database error, using fallback data:', error);
     return NextResponse.json({
-      headerData: fallbackHeaderData
+      headerData: fallbackHeaderData,
+      siteLogo: null,
+      siteTitle: 'Hillside Prime',
+      siteDescription: null,
+      contactEmail: null,
+      contactPhone: null,
+      contactAddress: 'Property Real estate 4263 Wilkinson Street Tennessee',
+      facebookUrl: null,
+      twitterUrl: null,
+      instagramUrl: null,
+      linkedinUrl: null,
     });
   }
 };

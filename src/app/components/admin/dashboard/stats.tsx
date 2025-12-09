@@ -2,12 +2,25 @@ import { prisma } from '@/lib/prisma';
 import { Icon } from '@iconify/react';
 
 export default async function StatsCards() {
-  const [propertyCount, blogCount, publishedBlogs, featuredProperties] = await Promise.all([
-    prisma.property.count(),
-    prisma.blog.count(),
-    prisma.blog.count({ where: { published: true } }),
-    prisma.property.count({ where: { featured: true } }),
-  ]);
+  // Provide safe defaults so the dashboard still renders if the database is unreachable
+  let propertyCount = 0;
+  let blogCount = 0;
+  let publishedBlogs = 0;
+  let featuredProperties = 0;
+
+  try {
+    [propertyCount, blogCount, publishedBlogs, featuredProperties] = await Promise.all([
+      prisma.property.count(),
+      prisma.blog.count(),
+      prisma.blog.count({ where: { published: true } }),
+      prisma.property.count({ where: { featured: true } }),
+    ]);
+  } catch (error) {
+    // Database is unreachable or another Prisma error occurred — log the error on the server
+    // and continue with safe defaults so the admin UI remains usable.
+    console.error('Database error in StatsCards, using fallback data:', error);
+    // leave the default values (zeros) so UI renders without crashing
+  }
 
   const stats = [
     {

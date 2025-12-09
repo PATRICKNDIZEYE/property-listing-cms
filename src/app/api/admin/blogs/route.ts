@@ -76,10 +76,17 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(blog, { status: 201 });
   } catch (error: any) {
-    if (error.message.includes('Unauthorized')) {
+    if (error.message?.includes('Unauthorized')) {
       return NextResponse.json({ error: error.message }, { status: 401 });
     }
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    if (error.code === 'P2002') {
+      return NextResponse.json({ 
+        error: 'A blog with this slug already exists' 
+      }, { status: 400 });
+    }
+    return NextResponse.json({ 
+      error: error.message || 'Failed to process request' 
+    }, { status: 500 });
   }
 }
 

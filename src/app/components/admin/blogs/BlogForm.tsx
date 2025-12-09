@@ -104,15 +104,17 @@ export default function BlogForm({ blogId }: BlogFormProps) {
         body: JSON.stringify(formData),
       });
 
+      const data = await response.json();
+      
       if (response.ok) {
         toast.success(blogId ? 'Blog updated successfully' : 'Blog created successfully');
         router.push('/admin/blogs');
+        router.refresh();
       } else {
-        const error = await response.json();
-        toast.error(error.error || 'Failed to save blog');
+        toast.error(data.error || 'Failed to save blog');
       }
-    } catch (error) {
-      toast.error('Error saving blog');
+    } catch (error: any) {
+      toast.error(error.message || 'Error saving blog');
     } finally {
       setLoading(false);
     }

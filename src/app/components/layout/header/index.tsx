@@ -13,6 +13,9 @@ const Header: React.FC = () => {
   const pathUrl = usePathname();
   const { data: session } = useSession();
   const { theme, setTheme } = useTheme();
+  
+  // Don't show public header when in admin area
+  const isAdminRoute = pathUrl?.startsWith('/admin');
 
   const [data, setData] = useState<any[]>([]);
   const [user, setUser] = useState<{ user: any } | null>(null);
@@ -55,14 +58,22 @@ const Header: React.FC = () => {
 
   useEffect(() => {
     window.addEventListener("scroll", handleScroll);
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
+    // Only use localStorage user if no session exists
+    if (!session?.user) {
+      const storedUser = localStorage.getItem("user");
+      if (storedUser) {
+        setUser(JSON.parse(storedUser));
+      } else {
+        setUser(null);
+      }
+    } else {
+      // Clear localStorage user when session exists
+      setUser(null);
     }
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
-  }, [pathUrl]);
+  }, [pathUrl, session]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -80,14 +91,10 @@ const Header: React.FC = () => {
     fetchData()
   }, [])
 
-  console.log("data",data);
-  
-
-
-  const handleSignOut = () => {
+  const handleSignOut = async () => {
     localStorage.removeItem("user");
-    signOut();
     setUser(null);
+    await signOut({ callbackUrl: '/' });
   };
 
   return (
@@ -123,25 +130,31 @@ const Header: React.FC = () => {
 
           {user?.user || session?.user ? (
             <>
-              {session?.user?.role === 'ADMIN' && (
+              {session?.user?.role === 'ADMIN' && !isAdminRoute && (
                 <Link
                   href="/admin"
-                  className="hidden lg:block bg-primary text-white px-4 py-2 rounded-lg hover:bg-blue-700 mr-2"
+                  className="hidden lg:block bg-primary text-white px-4 py-2 rounded-lg hover:bg-darkGreen mr-2"
                 >
                   Admin
                 </Link>
               )}
               <div className="relative group flex items-center justify-center">
-                <Image src={"/images/avatar/avatar_1.jpg"} alt="avatar" width={35} height={35} className="rounded-full" />
+                <Image 
+                  src={session?.user?.image || "/images/avatar/avatar_1.jpg"} 
+                  alt="avatar" 
+                  width={35} 
+                  height={35} 
+                  className="rounded-full" 
+                />
                 <p
                   className="absolute w-fit text-sm font-medium text-center z-10 invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-opacity duration-200 bg-primary text-white py-1 px-2 min-w-28 rounded-lg shadow-2xl top-full left-1/2 transform -translate-x-1/2 mt-3"
                 >
-                  {user?.user || session?.user?.name}
+                  {user?.user?.name || session?.user?.name || 'User'}
                 </p>
               </div>
               <button
                 onClick={() => handleSignOut()}
-                className="hidden lg:block bg-transparent border border-primary text-primary px-4 py-2 rounded-lg hover:bg-blue-600 hover:text-white"
+                className="hidden lg:block bg-transparent border border-primary text-primary px-4 py-2 rounded-lg hover:bg-primary hover:text-white"
               >
                 Sign Out
               </button>
@@ -150,14 +163,14 @@ const Header: React.FC = () => {
             <>
               <Link
                 href="/signin"
-                className="hidden lg:block bg-transparent border border-primary text-primary px-4 py-2 rounded-lg hover:bg-blue-600 hover:text-white"
+                className="hidden lg:block bg-white border border-primary text-primary px-4 py-2 rounded-lg hover:bg-primary hover:text-white"
               >
                 Sign In
               </Link>
 
               <Link
                 href="/signup"
-                className="hidden lg:block bg-primary text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+                className="hidden lg:block bg-primary text-white px-4 py-2 rounded-lg hover:bg-darkGreen"
               >
                 Sign Up
               </Link>
@@ -206,9 +219,23 @@ const Header: React.FC = () => {
           <div className="mt-4 flex flex-col space-y-4 w-full">
             {user?.user || session?.user ? (
               <>
+                {session?.user?.role === 'ADMIN' && !isAdminRoute && (
+                  <Link
+                    href="/admin"
+                    className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-darkGreen text-center"
+                    onClick={() => {
+                      setNavbarOpen(false);
+                    }}
+                  >
+                    Admin
+                  </Link>
+                )}
                 <button
-                  className="bg-transparent border border-primary text-primary px-4 py-2 rounded-lg hover:bg-blue-600 hover:text-white"
-                  onClick={() => handleSignOut()}
+                  className="bg-transparent border border-primary text-primary px-4 py-2 rounded-lg hover:bg-primary hover:text-white"
+                  onClick={() => {
+                    handleSignOut();
+                    setNavbarOpen(false);
+                  }}
                 >
                   Sign Out
                 </button>
@@ -217,7 +244,7 @@ const Header: React.FC = () => {
               <>
                 <Link
                   href="/signin"
-                  className="bg-transparent border border-primary text-primary px-4 py-2 rounded-lg hover:bg-blue-600 hover:text-white"
+                  className="bg-white border border-primary text-primary px-4 py-2 rounded-lg hover:bg-primary hover:text-white"
                   onClick={() => {
                     setNavbarOpen(false);
                   }}
@@ -226,7 +253,7 @@ const Header: React.FC = () => {
                 </Link>
                 <Link
                   href="/signup"
-                  className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+                  className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-darkGreen"
                   onClick={() => {
                     setNavbarOpen(false);
                   }}

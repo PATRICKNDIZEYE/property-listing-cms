@@ -3,31 +3,55 @@ import Link from 'next/link';
 import { Icon } from '@iconify/react';
 
 export default async function RecentActivity() {
-  const [recentProperties, recentBlogs] = await Promise.all([
-    prisma.property.findMany({
-      take: 5,
-      orderBy: { createdAt: 'desc' },
-      select: {
-        id: true,
-        propertyTitle: true,
-        slug: true,
-        propertyPrice: true,
-        category: true,
-        createdAt: true,
-      },
-    }),
-    prisma.blog.findMany({
-      take: 5,
-      orderBy: { createdAt: 'desc' },
-      select: {
-        id: true,
-        title: true,
-        slug: true,
-        published: true,
-        createdAt: true,
-      },
-    }),
-  ]);
+  // Provide safe defaults so the dashboard still renders if the database is unreachable
+  let recentProperties: Array<{
+    id: string;
+    propertyTitle: string;
+    slug: string;
+    propertyPrice: string;
+    category: string;
+    createdAt: Date;
+  }> = [];
+  let recentBlogs: Array<{
+    id: string;
+    title: string;
+    slug: string;
+    published: boolean;
+    createdAt: Date;
+  }> = [];
+
+  try {
+    [recentProperties, recentBlogs] = await Promise.all([
+      prisma.property.findMany({
+        take: 5,
+        orderBy: { createdAt: 'desc' },
+        select: {
+          id: true,
+          propertyTitle: true,
+          slug: true,
+          propertyPrice: true,
+          category: true,
+          createdAt: true,
+        },
+      }),
+      prisma.blog.findMany({
+        take: 5,
+        orderBy: { createdAt: 'desc' },
+        select: {
+          id: true,
+          title: true,
+          slug: true,
+          published: true,
+          createdAt: true,
+        },
+      }),
+    ]);
+  } catch (error) {
+    // Database is unreachable or another Prisma error occurred — log the error on the server
+    // and continue with safe defaults so the admin UI remains usable.
+    console.error('Database error in RecentActivity, using fallback data:', error);
+    // leave the default values (empty arrays) so UI renders without crashing
+  }
 
   return (
     <div className="bg-white dark:bg-semidark rounded-2xl shadow-lg p-8">

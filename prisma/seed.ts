@@ -457,7 +457,7 @@ async function main() {
     update: {},
     create: {
       id: '1',
-      siteTitle: 'Property',
+      siteTitle: 'Hillside Prime',
       siteDescription: 'Your trusted property listing platform',
       headerMenu: [
         { label: 'Home', href: '/' },

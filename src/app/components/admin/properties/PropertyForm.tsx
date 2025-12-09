@@ -132,19 +132,25 @@ export default function PropertyForm({ propertyId }: PropertyFormProps) {
         body: uploadFormData,
       });
 
+      const data = await response.json();
+      
       if (response.ok) {
-        const { url } = await response.json();
+        const imageUrl = data.image?.url || data.url;
+        if (!imageUrl) {
+          toast.error('Invalid response from server');
+          return;
+        }
         setFormData((prev) => ({
           ...prev,
-          propertyImg: url,
+          propertyImg: imageUrl,
         }));
-        setImagePreview(url);
+        setImagePreview(imageUrl);
         toast.success('Image uploaded successfully');
       } else {
-        toast.error('Failed to upload image');
+        toast.error(data.error || 'Failed to upload image');
       }
-    } catch (error) {
-      toast.error('Error uploading image');
+    } catch (error: any) {
+      toast.error(error.message || 'Error uploading image');
     } finally {
       setImageLoading(false);
     }
@@ -188,16 +194,17 @@ export default function PropertyForm({ propertyId }: PropertyFormProps) {
         body: JSON.stringify(formData),
       });
 
+      const data = await response.json();
+      
       if (response.ok) {
         toast.success(propertyId ? 'Property updated successfully' : 'Property created successfully');
         router.push('/admin/properties');
         router.refresh();
       } else {
-        const error = await response.json();
-        toast.error(error.error || 'Failed to save property');
+        toast.error(data.error || 'Failed to save property');
       }
-    } catch (error) {
-      toast.error('Error saving property');
+    } catch (error: any) {
+      toast.error(error.message || 'Error saving property');
     } finally {
       setLoading(false);
     }

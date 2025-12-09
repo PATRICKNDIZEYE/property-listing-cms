@@ -47,7 +47,8 @@ export const extendedConfig = {
     '999': '999'
   },
   colors: {
-    primary: "#2F73F2",
+    primary: "#19B57B",
+    darkGreen: "#158A5F",
     secondary: "#547593",
     midnight_text: "#102D47",
     gray: "#668199",
@@ -58,7 +59,7 @@ export const extendedConfig = {
     semidark: "#0e1624",
     darklight: "#1F2A37",
     dark_border: "#224767",
-    herobg: "#D1F2FF",
+    herobg: "#D1F2E5",
     cyan: "#46C4FF",
     lightgray:"#e5e7eb",
     darkgray:"#374151",

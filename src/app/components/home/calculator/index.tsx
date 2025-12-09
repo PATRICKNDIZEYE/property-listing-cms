@@ -71,7 +71,7 @@ export default function Calculator() {
           <div data-aos="fade-up">
             <Link
               href="/properties/properties-list"
-              className="text-xl bg-primary py-3 px-8 text-white rounded-lg me-3 mb-2 border border-primary hover:bg-blue-700"
+              className="text-xl bg-primary py-3 px-8 text-white rounded-lg me-3 mb-2 border border-primary hover:bg-darkGreen"
             >
               Buy House
             </Link>
@@ -126,7 +126,7 @@ export default function Calculator() {
                 step=""
                 value={price}
                 onChange={handlePriceChange}
-                className="w-full h-2 bg-blue-800 rounded-lg appearance-none cursor-pointer "
+                className="w-full h-2 bg-darkGreen rounded-lg appearance-none cursor-pointer "
               />
             </div>
             <div className="flex justify-between text-sm text-white mt-2 font-bold">
@@ -134,7 +134,7 @@ export default function Calculator() {
               <p>$400K</p>
             </div>
           </div>
-          <div className="p-4 bg-blue-700 text-white text-xl rounded-b-lg">
+          <div className="p-4 bg-darkGreen text-white text-xl rounded-b-lg">
             <p className="text-center mb-1 opacity-70">Have Questions?</p>
             <Link
               href={"tel:+909 887 0980"}

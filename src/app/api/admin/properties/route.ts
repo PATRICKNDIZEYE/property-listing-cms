@@ -33,7 +33,12 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 401 });
+    if (error.message?.includes('Unauthorized')) {
+      return NextResponse.json({ error: error.message }, { status: 401 });
+    }
+    return NextResponse.json({ 
+      error: error.message || 'Failed to fetch properties' 
+    }, { status: 500 });
   }
 }
 
@@ -112,10 +117,17 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(property, { status: 201 });
   } catch (error: any) {
-    if (error.message.includes('Unauthorized')) {
+    if (error.message?.includes('Unauthorized')) {
       return NextResponse.json({ error: error.message }, { status: 401 });
     }
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    if (error.code === 'P2002') {
+      return NextResponse.json({ 
+        error: 'A property with this slug already exists' 
+      }, { status: 400 });
+    }
+    return NextResponse.json({ 
+      error: error.message || 'Failed to create property' 
+    }, { status: 500 });
   }
 }
 

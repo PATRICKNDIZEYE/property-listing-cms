@@ -20,10 +20,17 @@ export async function GET(
 
     return NextResponse.json(blog);
   } catch (error: any) {
-    if (error.message.includes('Unauthorized')) {
+    if (error.message?.includes('Unauthorized')) {
       return NextResponse.json({ error: error.message }, { status: 401 });
     }
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    if (error.code === 'P2002') {
+      return NextResponse.json({ 
+        error: 'A blog with this slug already exists' 
+      }, { status: 400 });
+    }
+    return NextResponse.json({ 
+      error: error.message || 'Failed to process request' 
+    }, { status: 500 });
   }
 }
 
@@ -77,10 +84,17 @@ export async function PUT(
 
     return NextResponse.json(blog);
   } catch (error: any) {
-    if (error.message.includes('Unauthorized')) {
+    if (error.message?.includes('Unauthorized')) {
       return NextResponse.json({ error: error.message }, { status: 401 });
     }
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    if (error.code === 'P2002') {
+      return NextResponse.json({ 
+        error: 'A blog with this slug already exists' 
+      }, { status: 400 });
+    }
+    return NextResponse.json({ 
+      error: error.message || 'Failed to process request' 
+    }, { status: 500 });
   }
 }
 
@@ -106,10 +120,17 @@ export async function DELETE(
 
     return NextResponse.json({ message: 'Blog deleted successfully' });
   } catch (error: any) {
-    if (error.message.includes('Unauthorized')) {
+    if (error.message?.includes('Unauthorized')) {
       return NextResponse.json({ error: error.message }, { status: 401 });
     }
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    if (error.code === 'P2002') {
+      return NextResponse.json({ 
+        error: 'A blog with this slug already exists' 
+      }, { status: 400 });
+    }
+    return NextResponse.json({ 
+      error: error.message || 'Failed to process request' 
+    }, { status: 500 });
   }
 }
 

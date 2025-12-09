@@ -56,14 +56,16 @@ export default function ImageLibrary() {
         method: "DELETE",
       });
 
+      const data = await response.json();
+      
       if (response.ok) {
         toast.success("Image deleted successfully");
         fetchImages();
       } else {
-        toast.error("Failed to delete image");
+        toast.error(data.error || "Failed to delete image");
       }
-    } catch (error) {
-      toast.error("Error deleting image");
+    } catch (error: any) {
+      toast.error(error.message || "Error deleting image");
     }
   };
 
