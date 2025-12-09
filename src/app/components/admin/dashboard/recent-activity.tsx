@@ -30,37 +30,48 @@ export default async function RecentActivity() {
   ]);
 
   return (
-    <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-      <div className="bg-white dark:bg-semidark rounded-xl shadow-lg overflow-hidden">
-        <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-6">
-          <h2 className="text-xl font-bold text-white flex items-center gap-2">
-            <Icon icon="ion:home" width={24} height={24} />
-            Recent Properties
+    <div className="bg-white dark:bg-semidark rounded-2xl shadow-lg p-8">
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h2 className="text-2xl font-bold text-midnight_text dark:text-white flex items-center gap-2">
+            <Icon icon="ion:time-outline" className="w-6 h-6 text-primary" />
+            Recent Activity
           </h2>
+          <p className="text-sm text-gray dark:text-gray mt-1">
+            Your latest properties and blogs
+          </p>
         </div>
-        <div className="p-6">
+      </div>
+
+      <div className="space-y-6">
+        {/* Recent Properties Section */}
+        <div>
+          <div className="flex items-center gap-2 mb-4">
+            <Icon icon="ion:home-outline" className="w-5 h-5 text-blue-600" />
+            <h3 className="font-semibold text-midnight_text dark:text-white">Properties</h3>
+          </div>
           {recentProperties.length > 0 ? (
-            <ul className="space-y-3">
+            <ul className="space-y-2">
               {recentProperties.map((property) => (
                 <li key={property.id}>
                   <Link
-                    href={`/admin/properties/${property.id}/edit`}
-                    className="flex items-center justify-between p-4 rounded-lg hover:bg-light dark:hover:bg-darklight transition-all duration-200 border border-transparent hover:border-primary/20"
+                    href={`/admin/properties/${property.id}`}
+                    className="group flex items-center justify-between p-4 border border-blue-200 dark:border-blue-800 bg-gradient-to-br from-blue-50/50 to-blue-50/30 dark:from-blue-900/10 dark:to-blue-900/5 rounded-lg hover:shadow-md hover:border-blue-400 dark:hover:border-blue-600 transition-all hover:-translate-y-0.5"
                   >
-                    <div className="flex-1">
-                      <span className="font-semibold text-midnight_text dark:text-white block">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-midnight_text dark:text-white truncate group-hover:text-primary transition-colors">
                         {property.propertyTitle}
-                      </span>
-                      <div className="flex items-center gap-3 mt-1">
-                        <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">
+                      </p>
+                      <div className="flex items-center gap-2 mt-1 flex-wrap">
+                        <span className="text-xs bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 px-2 py-0.5 rounded">
                           {property.category}
                         </span>
-                        <span className="text-sm text-gray dark:text-gray">
+                        <span className="text-xs text-gray dark:text-gray">
                           {property.propertyPrice}
                         </span>
                       </div>
                     </div>
-                    <span className="text-xs text-gray dark:text-gray">
+                    <span className="text-xs text-gray dark:text-gray ml-2 whitespace-nowrap">
                       {new Date(property.createdAt).toLocaleDateString()}
                     </span>
                   </Link>
@@ -68,40 +79,43 @@ export default async function RecentActivity() {
               ))}
             </ul>
           ) : (
-            <p className="text-center text-gray dark:text-gray py-8">No properties yet</p>
+            <div className="text-center py-6 border border-dashed border-border dark:border-dark_border rounded-lg">
+              <Icon icon="ion:home-outline" className="w-8 h-8 text-gray dark:text-gray mx-auto mb-2 opacity-50" />
+              <p className="text-sm text-gray dark:text-gray">No properties yet</p>
+            </div>
           )}
         </div>
-      </div>
 
-      <div className="bg-white dark:bg-semidark rounded-xl shadow-lg overflow-hidden">
-        <div className="bg-gradient-to-r from-green-500 to-green-600 p-6">
-          <h2 className="text-xl font-bold text-white flex items-center gap-2">
-            <Icon icon="ion:document-text" width={24} height={24} />
-            Recent Blogs
-          </h2>
-        </div>
-        <div className="p-6">
+        {/* Divider */}
+        <div className="h-px bg-border dark:bg-dark_border"></div>
+
+        {/* Recent Blogs Section */}
+        <div>
+          <div className="flex items-center gap-2 mb-4">
+            <Icon icon="ion:document-text-outline" className="w-5 h-5 text-green-600" />
+            <h3 className="font-semibold text-midnight_text dark:text-white">Blogs</h3>
+          </div>
           {recentBlogs.length > 0 ? (
-            <ul className="space-y-3">
+            <ul className="space-y-2">
               {recentBlogs.map((blog) => (
                 <li key={blog.id}>
                   <Link
-                    href={`/admin/blogs/${blog.id}/edit`}
-                    className="flex items-center justify-between p-4 rounded-lg hover:bg-light dark:hover:bg-darklight transition-all duration-200 border border-transparent hover:border-primary/20"
+                    href={`/admin/blogs/${blog.id}`}
+                    className="group flex items-center justify-between p-4 border border-green-200 dark:border-green-800 bg-gradient-to-br from-green-50/50 to-green-50/30 dark:from-green-900/10 dark:to-green-900/5 rounded-lg hover:shadow-md hover:border-green-400 dark:hover:border-green-600 transition-all hover:-translate-y-0.5"
                   >
-                    <div className="flex-1">
-                      <span className="font-semibold text-midnight_text dark:text-white block">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-midnight_text dark:text-white truncate group-hover:text-primary transition-colors">
                         {blog.title}
-                      </span>
-                      <span className={`text-xs mt-1 inline-block px-2 py-1 rounded ${
+                      </p>
+                      <span className={`text-xs mt-1 inline-block px-2 py-0.5 rounded transition-all ${
                         blog.published 
-                          ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' 
-                          : 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400'
+                          ? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300' 
+                          : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300'
                       }`}>
-                        {blog.published ? 'Published' : 'Draft'}
+                        {blog.published ? '✓ Published' : '○ Draft'}
                       </span>
                     </div>
-                    <span className="text-xs text-gray dark:text-gray">
+                    <span className="text-xs text-gray dark:text-gray ml-2 whitespace-nowrap">
                       {new Date(blog.createdAt).toLocaleDateString()}
                     </span>
                   </Link>
@@ -109,7 +123,10 @@ export default async function RecentActivity() {
               ))}
             </ul>
           ) : (
-            <p className="text-center text-gray dark:text-gray py-8">No blogs yet</p>
+            <div className="text-center py-6 border border-dashed border-border dark:border-dark_border rounded-lg">
+              <Icon icon="ion:document-text-outline" className="w-8 h-8 text-gray dark:text-gray mx-auto mb-2 opacity-50" />
+              <p className="text-sm text-gray dark:text-gray">No blogs yet</p>
+            </div>
           )}
         </div>
       </div>

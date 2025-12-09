@@ -60,9 +60,6 @@ export async function GET(request: NextRequest) {
       prisma.analytics.findMany({
         take: 10,
         orderBy: { createdAt: 'desc' },
-        include: {
-          // Note: We can't include related entities directly, but we can structure the response
-        },
       }),
     ]);
 

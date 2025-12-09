@@ -131,6 +131,8 @@ export default function BlogForm({ blogId }: BlogFormProps) {
             value={formData.title}
             onChange={handleChange}
             required
+            title="Blog title"
+            placeholder="Enter blog title"
             className="w-full px-4 py-3 border border-border dark:border-dark_border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary dark:bg-darkmode dark:text-white"
           />
         </div>
@@ -145,6 +147,8 @@ export default function BlogForm({ blogId }: BlogFormProps) {
             value={formData.slug}
             onChange={handleChange}
             required
+            title="URL-friendly slug"
+            placeholder="blog-slug"
             className="w-full px-4 py-3 border border-border dark:border-dark_border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary dark:bg-darkmode dark:text-white"
           />
         </div>
@@ -158,6 +162,8 @@ export default function BlogForm({ blogId }: BlogFormProps) {
             value={formData.excerpt}
             onChange={handleChange}
             rows={3}
+            title="Brief excerpt of the blog post"
+            placeholder="Enter a brief excerpt..."
             className="w-full px-4 py-3 border border-border dark:border-dark_border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary dark:bg-darkmode dark:text-white"
           />
         </div>
@@ -172,8 +178,9 @@ export default function BlogForm({ blogId }: BlogFormProps) {
             onChange={handleChange}
             required
             rows={15}
-            className="w-full px-4 py-3 border border-border dark:border-dark_border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary dark:bg-darkmode dark:text-white font-mono text-sm"
+            title="Blog content in Markdown format"
             placeholder="Write your blog content here. Markdown is supported."
+            className="w-full px-4 py-3 border border-border dark:border-dark_border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary dark:bg-darkmode dark:text-white font-mono text-sm"
           />
         </div>
 
@@ -187,8 +194,9 @@ export default function BlogForm({ blogId }: BlogFormProps) {
               name="coverImage"
               value={formData.coverImage}
               onChange={handleChange}
-              className="w-full px-4 py-3 border border-border dark:border-dark_border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary dark:bg-darkmode dark:text-white"
+              title="URL to cover image"
               placeholder="/images/blog/blog-image.jpg"
+              className="w-full px-4 py-3 border border-border dark:border-dark_border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary dark:bg-darkmode dark:text-white"
             />
           </div>
 
@@ -201,6 +209,8 @@ export default function BlogForm({ blogId }: BlogFormProps) {
               name="author"
               value={formData.author}
               onChange={handleChange}
+              title="Author name"
+              placeholder="Admin"
               className="w-full px-4 py-3 border border-border dark:border-dark_border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary dark:bg-darkmode dark:text-white"
             />
           </div>
@@ -214,6 +224,8 @@ export default function BlogForm({ blogId }: BlogFormProps) {
               name="date"
               value={formData.date}
               onChange={handleChange}
+              title="Publication date"
+              placeholder="Select date"
               className="w-full px-4 py-3 border border-border dark:border-dark_border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary dark:bg-darkmode dark:text-white"
             />
           </div>
@@ -224,6 +236,7 @@ export default function BlogForm({ blogId }: BlogFormProps) {
               name="published"
               checked={formData.published}
               onChange={handleChange}
+              title="Publish this blog post"
               className="w-4 h-4"
             />
             <label className="text-sm font-medium text-midnight_text dark:text-white">

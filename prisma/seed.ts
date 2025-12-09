@@ -1,5 +1,8 @@
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
+import fs from 'fs/promises';
+import path from 'path';
+import matter from 'gray-matter';
 
 const prisma = new PrismaClient();
 
@@ -397,6 +400,56 @@ async function main() {
     });
   }
   console.log(`Created ${properties.length} properties`);
+
+  // Seed blogs from markdown files in /markdown/blogs (if present)
+  try {
+    const blogsDir = path.join(__dirname, '../markdown/blogs');
+    const files = await fs.readdir(blogsDir);
+    const mdFiles = files.filter(f => f.endsWith('.md') || f.endsWith('.mdx'));
+
+    console.log(`Found ${mdFiles.length} blog files to seed.`);
+
+    for (const file of mdFiles) {
+      try {
+        const filePath = path.join(blogsDir, file);
+        const raw = await fs.readFile(filePath, 'utf-8');
+        const parsed = matter(raw);
+        const fm = parsed.data as any;
+        const content = parsed.content || '';
+
+        const slugFromName = file.replace(/\.(md|mdx)$/, '');
+        const slug = (fm.slug as string) || slugFromName;
+        const title = (fm.title as string) || slugFromName.replace(/_/g, ' ');
+        const excerpt = (fm.excerpt as string) || (content.substring(0, 200) + '...');
+        const coverImage = (fm.coverImage as string) || null;
+        const author = (fm.author as string) || 'Admin';
+        const published = typeof fm.published === 'boolean' ? fm.published : true;
+        const date = fm.date ? new Date(fm.date) : new Date();
+
+        await prisma.blog.upsert({
+          where: { slug },
+          update: {},
+          create: {
+            title,
+            slug,
+            excerpt,
+            content,
+            coverImage,
+            author,
+            published,
+            date,
+          },
+        });
+      } catch (err) {
+        console.warn('Failed to seed blog file', file, err);
+      }
+    }
+
+    console.log('Blog seeding completed.');
+  } catch (err) {
+    // Ensure we don't reference properties that TypeScript can't statically verify on unknown error objects
+    console.log('No markdown blog files found or failed to read directory.', (err as any)?.message ?? String(err));
+  }
 
   // Create default site settings
   const settings = await prisma.siteSettings.upsert({

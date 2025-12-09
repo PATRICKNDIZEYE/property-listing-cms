@@ -19,6 +19,10 @@ export default function AdminLogin() {
     setLoading(true);
 
     try {
+      // Use credentials sign-in without redirect and poll the session endpoint
+      // until the session is available server-side. This avoids race conditions
+      // where the admin layout can't see the session immediately after a
+      // client-side redirect and would render without the sidebar.
       const result = await signIn('credentials', {
         email: formData.email,
         password: formData.password,
@@ -31,22 +35,55 @@ export default function AdminLogin() {
         return;
       }
 
-      // Wait a bit for session to be set
-      await new Promise(resolve => setTimeout(resolve, 500));
+      // Poll /api/auth/session until the session appears (or timeout)
+      const maxAttempts = 10;
+      const baseDelay = 300; // ms
+      let attempt = 0;
+      let session: any = null;
 
-      // Check if user is admin
-      const response = await fetch('/api/auth/session');
-      const session = await response.json();
+      while (attempt < maxAttempts) {
+        const res = await fetch('/api/auth/session');
+        try {
+          session = await res.json();
+        } catch (e) {
+          session = null;
+        }
 
-      if (session?.user?.role !== 'ADMIN') {
+        if (session?.user) break;
+
+        // exponential backoff
+        await new Promise((r) => setTimeout(r, baseDelay * (attempt + 1)));
+        attempt++;
+      }
+
+      if (!session?.user) {
+        toast.error('Login failed (session not established). Try again.');
+        setLoading(false);
+        return;
+      }
+
+      if (session.user.role !== 'ADMIN') {
         toast.error('Access denied. Admin privileges required.');
         setLoading(false);
         return;
       }
 
       toast.success('Login successful');
-      router.refresh();
-      router.push('/admin');
+
+      // Give the auth system a short moment to ensure any cookies are set
+      // then navigate to /admin using a full document replace. Using
+      // `window.location.replace` guarantees the server receives the
+      // cookie/session on the very next request and will render the
+      // `AdminLayout` (with sidebar) immediately — avoiding a case where
+      // client-side navigation lands on the dashboard content but the
+      // server layout hasn't recognized the session yet.
+      await new Promise((r) => setTimeout(r, 150));
+      if (typeof window !== 'undefined') {
+        window.location.replace('/admin');
+      } else {
+        // Fallback to router replace in non-browser environments
+        router.replace('/admin');
+      }
     } catch (error) {
       toast.error('Something went wrong');
       setLoading(false);

@@ -7,7 +7,8 @@ export const metadata: Metadata = {
   title: 'Edit Property',
 };
 
-export default function EditPropertyPage({ params }: { params: { id: string } }) {
+export default function EditPropertyPage(props: any) {
+  const { params } = props;
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">

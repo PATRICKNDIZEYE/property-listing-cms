@@ -1,5 +1,4 @@
-import { getAllPosts, getPostBySlug } from "@/utils/markdown";
-import markdownToHtml from "@/utils/markdownToHtml";
+import { getAllPosts, getPostBySlug, markdownToHtml } from "@/utils/markdown";
 import { format } from "date-fns";
 import Image from "next/image";
 

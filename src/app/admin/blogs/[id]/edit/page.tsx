@@ -7,7 +7,8 @@ export const metadata: Metadata = {
   title: 'Edit Blog',
 };
 
-export default function EditBlogPage({ params }: { params: { id: string } }) {
+export default function EditBlogPage(props: any) {
+  const { params } = props;
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
