@@ -24,6 +24,7 @@ const Hero = () => {
   const [sellSliders, setSellSliders] = useState<HeroSlider[]>([]);
   const [buySliders, setBuySliders] = useState<HeroSlider[]>([]);
   const sliderRef = useRef<Slider>(null);
+  const [activePart, setActivePart] = useState<1 | 2>(1); // Part 1 = right, Part 2 = left
 
   useEffect(() => {
     const fetchData = async () => {
@@ -51,6 +52,7 @@ const Hero = () => {
 
         if (sellResponse.ok) {
           const sellData = await sellResponse.json();
+          console.log('Sell sliders data:', sellData);
           setSellSliders(sellData.sliders || []);
         } else {
           setSellSliders([]);
@@ -58,6 +60,7 @@ const Hero = () => {
 
         if (buyResponse.ok) {
           const buyData = await buyResponse.json();
+          console.log('Buy sliders data:', buyData);
           setBuySliders(buyData.sliders || []);
         } else {
           setBuySliders([]);
@@ -82,6 +85,9 @@ const Hero = () => {
   };
 
   const currentSliders = activeTab === 'sell' ? sellSliders : buySliders;
+  
+  // Debug log
+  console.log('Current sliders:', currentSliders.length, 'Active tab:', activeTab);
 
   // Reset slider when sliders change or tab changes
   useEffect(() => {
@@ -94,6 +100,15 @@ const Hero = () => {
       }, 100);
     }
   }, [currentSliders.length, activeTab]);
+
+  // Auto-switch between Part 1 and Part 2 every 2 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActivePart((prev) => (prev === 1 ? 2 : 1));
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   const sliderSettings = {
     dots: false,
@@ -110,6 +125,9 @@ const Hero = () => {
     adaptiveHeight: false,
     lazyLoad: 'ondemand' as const,
   };
+
+  // Imigongo pattern background (same for both light and dark mode - using light theme pattern)
+  const imigongoPattern = "url(\"data:image/svg+xml,%3Csvg width='240' height='240' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cpattern id='imigongo' x='0' y='0' width='240' height='240' patternUnits='userSpaceOnUse'%3E%3Cg opacity='0.1'%3E%3Cpath d='M120,120 L100,100 L120,80 L140,100 Z' fill='%231A1A1A'/%3E%3Cpath d='M120,120 L100,100 L120,140 L140,100 Z' fill='%231A1A1A'/%3E%3Cpath d='M120,120 L140,100 L120,80 L100,100 Z' fill='%231A1A1A'/%3E%3Cpath d='M120,120 L140,100 L120,140 L100,100 Z' fill='%231A1A1A'/%3E%3C/g%3E%3Cg opacity='0.09'%3E%3Cpath d='M80,80 L160,80 L160,160 L80,160 Z' fill='none' stroke='%231A1A1A' stroke-width='4'/%3E%3Cpath d='M60,60 L180,60 L180,180 L60,180 Z' fill='none' stroke='%231A1A1A' stroke-width='3.5'/%3E%3Cpath d='M40,40 L200,40 L200,200 L40,200 Z' fill='none' stroke='%231A1A1A' stroke-width='3'/%3E%3C/g%3E%3Cg opacity='0.11'%3E%3Cpath d='M0,0 L60,60 L0,120 L60,60 Z' fill='none' stroke='%231A1A1A' stroke-width='5'/%3E%3Cpath d='M240,0 L180,60 L240,120 L180,60 Z' fill='none' stroke='%231A1A1A' stroke-width='5'/%3E%3Cpath d='M0,240 L60,180 L0,120 L60,180 Z' fill='none' stroke='%231A1A1A' stroke-width='5'/%3E%3Cpath d='M240,240 L180,180 L240,120 L180,180 Z' fill='none' stroke='%231A1A1A' stroke-width='5'/%3E%3C/g%3E%3Cg opacity='0.08'%3E%3Cpath d='M0,0 L30,30 L60,0 L30,60 L0,60 L30,30 Z' fill='none' stroke='%231A1A1A' stroke-width='3.5'/%3E%3Cpath d='M240,0 L210,30 L180,0 L210,60 L240,60 L210,30 Z' fill='none' stroke='%231A1A1A' stroke-width='3.5'/%3E%3Cpath d='M0,240 L30,210 L60,240 L30,180 L0,180 L30,210 Z' fill='none' stroke='%231A1A1A' stroke-width='3.5'/%3E%3Cpath d='M240,240 L210,210 L180,240 L210,180 L240,180 L210,210 Z' fill='none' stroke='%231A1A1A' stroke-width='3.5'/%3E%3C/g%3E%3Cg opacity='0.07'%3E%3Cpath d='M0,120 L80,40 L160,120 L80,200 L0,120 Z' fill='none' stroke='%231A1A1A' stroke-width='3'/%3E%3Cpath d='M240,120 L160,40 L80,120 L160,200 L240,120 Z' fill='none' stroke='%231A1A1A' stroke-width='3'/%3E%3Cpath d='M120,0 L40,80 L120,160 L200,80 L120,0 Z' fill='none' stroke='%231A1A1A' stroke-width='3'/%3E%3Cpath d='M120,240 L40,160 L120,80 L200,160 L120,240 Z' fill='none' stroke='%231A1A1A' stroke-width='3'/%3E%3C/g%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23imigongo)'/%3E%3C/svg%3E\")";
 
   const handleSearchSell = () => {
     if (location.trim() === '') {
@@ -142,38 +160,90 @@ const Hero = () => {
 
   return (
     <section className="relative pt-44 pb-0 dark:bg-darklight overflow-x-hidden min-h-[600px]">
-      {/* Background Slider */}
-      {currentSliders.length > 0 && (
-        <div className="absolute inset-0 z-0 w-full h-full">
-          <Slider 
-            key={`slider-${activeTab}-${currentSliders.length}-${currentSliders.map(s => s.id).join('-')}`}
-            ref={sliderRef} 
-            {...sliderSettings}
-          >
-            {currentSliders.map((slider, index) => (
-              <div key={slider.id} className="h-full w-full relative">
-                <div className="absolute inset-0 bg-gradient-to-b from-white/90 from-10% dark:from-darkmode/90 to-herobg/90 to-90% dark:to-darklight/90 z-10 pointer-events-none"></div>
-                <Image
-                  src={slider.imageUrl}
-                  alt={`Hero background ${slider.order + 1}`}
-                  fill
-                  className="object-cover"
-                  priority={index === 0}
-                  quality={90}
-                  unoptimized={false}
-                />
-              </div>
-            ))}
-          </Slider>
+      {/* Full background imigongo pattern for dark mode */}
+      <div 
+        className="absolute inset-0 z-0 w-full h-full hidden dark:block"
+        style={{
+          backgroundImage: imigongoPattern,
+          backgroundSize: '480px 480px',
+          backgroundRepeat: 'repeat'
+        }}
+      ></div>
+
+      {/* Split-screen container */}
+      <div className="absolute inset-0 z-0 w-full h-full flex">
+        {/* Part 1 - Right Side */}
+        <div 
+          className={`relative w-1/2 h-full ${
+            activePart === 1 ? 'z-10' : 'z-0'
+          }`}
+        >
+          {activePart === 1 && currentSliders.length > 0 && (
+            <div className="absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out">
+              <Slider 
+                key={`slider-${activeTab}-${currentSliders.length}-${currentSliders.map(s => s.id).join('-')}`}
+                ref={sliderRef} 
+                {...sliderSettings}
+              >
+                {currentSliders.map((slider, index) => (
+                  <div key={slider.id} className="relative" style={{ height: '600px' }}>
+                    <Image
+                      src={slider.imageUrl}
+                      alt={`Hero background ${slider.order + 1}`}
+                      fill
+                      className="object-cover"
+                      priority={index === 0}
+                      quality={90}
+                      sizes="50vw"
+                      unoptimized={false}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-b from-white/90 from-10% dark:from-darkmode/90 to-herobg/90 to-90% dark:to-darklight/90 z-10 pointer-events-none"></div>
+                  </div>
+                ))}
+              </Slider>
+            </div>
+          )}
         </div>
-      )}
+
+        {/* Part 2 - Left Side */}
+        <div 
+          className={`relative w-1/2 h-full ${
+            activePart === 2 ? 'z-10' : 'z-0'
+          }`}
+        >
+          {activePart === 2 && currentSliders.length > 0 && (
+            <div className="absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out">
+              <Slider 
+                key={`slider-${activeTab}-${currentSliders.length}-${currentSliders.map(s => s.id).join('-')}-part2`}
+                {...sliderSettings}
+              >
+                {currentSliders.map((slider, index) => (
+                  <div key={slider.id} className="relative" style={{ height: '600px' }}>
+                    <Image
+                      src={slider.imageUrl}
+                      alt={`Hero background ${slider.order + 1}`}
+                      fill
+                      className="object-cover"
+                      priority={index === 0}
+                      quality={90}
+                      sizes="50vw"
+                      unoptimized={false}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-b from-white/90 from-10% dark:from-darkmode/90 to-herobg/90 to-90% dark:to-darklight/90 z-10 pointer-events-none"></div>
+                  </div>
+                ))}
+              </Slider>
+            </div>
+          )}
+        </div>
+      </div>
       
       {/* Fallback gradient background if no sliders */}
       {currentSliders.length === 0 && (
-        <div className="absolute inset-0 z-0 bg-gradient-to-b from-white from-10% dark:from-darkmode to-herobg to-90% dark:to-darklight"></div>
+        <div className="absolute inset-0 z-0 bg-gradient-to-b from-white/80 from-10% dark:from-darkmode/80 to-herobg/80 to-90% dark:to-darklight/80"></div>
       )}
 
-      <div className="container mx-auto lg:max-w-screen-xl md:max-w-screen-md relative z-10">
+      <div className="container mx-auto lg:max-w-screen-xl md:max-w-screen-md relative z-20">
         <div className="grid lg:grid-cols-12 grid-cols-1">
           <div
             className="flex flex-col col-span-6 justify-center items-start"
@@ -360,15 +430,6 @@ const Hero = () => {
                 </p>
               </div>
             </div>
-          </div>
-          <div className="lg:block hidden col-span-6 absolute xl:-right-60 right-0 bottom-0 -z-1">
-            <Image
-              src="/images/hero/hero-image.png"
-              alt="heroimage"
-              width={800}
-              height={0}
-              style={{ width: "100%", height: "auto" }}
-            />
           </div>
         </div>
       </div>

@@ -8,6 +8,7 @@ export interface Filters {
     beds: any;
     baths: any;
     garages: any;
+    minPrice?: any;
     key?: any;
   }
   

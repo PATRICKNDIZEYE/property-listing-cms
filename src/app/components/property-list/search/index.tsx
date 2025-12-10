@@ -305,9 +305,15 @@ export default function AdvanceSearch({ category }: { category?: string }) {
                                 </div>
                             </div>
                             {filteredProperties.length > 0 ?
-                                <div className={` ${viewMode === 'grid' ? 'grid sm:grid-cols-2' : 'flex flex-col'} gap-6 px-4`}>
+                                <div className={` ${viewMode === 'grid' ? 'grid sm:grid-cols-2' : 'flex flex-col'} gap-6 px-4`} style={{ minHeight: '500px' }}>
                                     {(sortOrder ? sortedProperties : properties).map((data: any, index: any) => (
-                                        <PropertyCard key={index} property={data} viewMode={viewMode} />
+                                        <div 
+                                            key={data.id || `property-${index}`} 
+                                            className="opacity-100 transition-opacity duration-300 ease-in-out"
+                                            style={{ minHeight: '400px' }}
+                                        >
+                                            <PropertyCard property={data} viewMode={viewMode} />
+                                        </div>
                                     ))}
                                 </div>
                                 :

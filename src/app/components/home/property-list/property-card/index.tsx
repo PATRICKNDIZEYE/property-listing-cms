@@ -13,9 +13,8 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, viewMode }) => {
   
   return (
     <div
-      key={property.id}
-      className={`bg-white shadow-property dark:bg-darklight rounded-lg overflow-hidden`}
-      data-aos="fade-up"
+      className={`bg-white shadow-property dark:bg-darklight rounded-lg overflow-hidden transition-opacity duration-300`}
+      style={{ minHeight: '400px', willChange: 'auto' }}
     >
       <Link href={`/properties/properties-list/${property.slug}`} className={`group ${viewMode=="list" && 'flex' }`}>
         <div className={`relative ${viewMode=="list" && 'w-[30%]'}`}>

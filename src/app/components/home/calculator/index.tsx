@@ -1,18 +1,96 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import "../../../../app/style/index.css";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useContext } from "react";
+import { PropertyContext } from "@/context-api/PropertyContext";
 
 export default function Calculator() {
-  const [activeTab, setActiveTab] = useState("sell");
-  const [price, setPrice] = useState(10000);
+  const router = useRouter();
+  const { properties, updateFilter, filters } = useContext(PropertyContext)!;
+  const [price, setPrice] = useState(0);
+  const [minPrice, setMinPrice] = useState(0);
+  const [maxPrice, setMaxPrice] = useState(0);
+  const [allPropertiesData, setAllPropertiesData] = useState<any[]>([]);
+  const hasClearedFilter = useRef(false);
 
-  const handleTabChange = (tab: any) => {
-    setActiveTab(tab);
+  // Clear price filter when component mounts (only once)
+  useEffect(() => {
+    if (!hasClearedFilter.current && filters?.minPrice) {
+      updateFilter('minPrice', '');
+      hasClearedFilter.current = true;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Fetch properties and calculate min/max prices
+  useEffect(() => {
+    const fetchProperties = async () => {
+      try {
+        const res = await fetch('/api/propertydata');
+        if (!res.ok) throw new Error('Failed to fetch');
+        const data = await res.json();
+        
+        if (data && data.length > 0) {
+          setAllPropertiesData(data);
+          // Parse all prices and find min/max
+          const prices = data.map((prop: any) => {
+            // Remove currency symbols, commas, and spaces, then parse
+            return parseInt(prop.property_price.replace(/[^0-9]/g, ''), 10) || 0;
+          }).filter((p: number) => p > 0);
+          
+          if (prices.length > 0) {
+            const min = Math.min(...prices);
+            const max = Math.max(...prices);
+            setMinPrice(min);
+            setMaxPrice(max);
+            // Set initial price to minimum (reset when component loads)
+            setPrice(min);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching properties:', error);
+        // Fallback values
+        setMinPrice(1000000);
+        setMaxPrice(500000000);
+        if (price === 0) {
+          setPrice(1000000);
+        }
+      }
+    };
+
+    fetchProperties();
+  }, []);
+
+  // Calculate available properties count using useMemo to prevent unnecessary recalculations
+  const availableCount = useMemo(() => {
+    if (!allPropertiesData || allPropertiesData.length === 0 || price === 0) {
+      return 0;
+    }
+    return allPropertiesData.filter((prop: any) => {
+      const propPrice = parseInt(prop.property_price.replace(/[^0-9]/g, ''), 10) || 0;
+      return propPrice >= price;
+    }).length;
+  }, [price, allPropertiesData]);
+
+  // Debounced price change handler to prevent shaking
+  const handlePriceChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const newPrice = Number(event.target.value);
+    setPrice(newPrice);
+  }, []);
+
+  const formatRWF = (amount: number) => {
+    return new Intl.NumberFormat('en-RW', {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(amount);
   };
 
-  const handlePriceChange = (event: any) => {
-    setPrice(event.target.value);
+  const handleViewProperties = () => {
+    // Set the price filter and navigate
+    updateFilter('minPrice', price.toString());
+    router.push('/properties/properties-list');
   };
 
   return (
@@ -26,11 +104,11 @@ export default function Calculator() {
             className="text-4xl mb-4 font-bold text-midnight_text dark:text-white"
             data-aos="fade-left"
           >
-            Save Your Money
+            Find Your Perfect Property
           </h2>
           <p className="text-xl text-gray mb-12" data-aos="fade-left">
-            Sometimes by accident, sometimes chunks as necessary making this the
-            first true generator on the Internet.
+            Set your budget and discover properties that match your financial goals. 
+            Find the perfect home within your price range.
           </p>
           <div className="relative-container">
             <div className="main-div mb-16 pt-8">
@@ -41,9 +119,9 @@ export default function Calculator() {
                   data-aos-delay="100"
                 >
                   <p className="text-3xl text-midnight_text dark:text-white">
-                    3% Save
+                    {availableCount > 0 ? availableCount : '0'}
                   </p>
-                  <p className="text-gray text-base">Above $50K</p>
+                  <p className="text-gray text-base">Properties Available</p>
                 </div>
                 <div
                   className="money-dot relative"
@@ -51,9 +129,9 @@ export default function Calculator() {
                   data-aos-delay="200"
                 >
                   <p className="text-3xl text-midnight_text dark:text-white">
-                    5% Save
+                    {minPrice > 0 ? formatRWF(minPrice) : '0'}
                   </p>
-                  <p className="text-gray text-base">Above $75K</p>
+                  <p className="text-gray text-base">Starting From</p>
                 </div>
                 <div
                   className="money-dot relative"
@@ -61,77 +139,72 @@ export default function Calculator() {
                   data-aos-delay="300"
                 >
                   <p className="text-3xl text-midnight_text dark:text-white">
-                    8% Save
+                    {maxPrice > 0 ? formatRWF(maxPrice) : '0'}
                   </p>
-                  <p className="text-gray text-base">Above $90K</p>
+                  <p className="text-gray text-base">Up To</p>
                 </div>
               </div>
             </div>
           </div>
           <div data-aos="fade-up">
-            <Link
-              href="/properties/properties-list"
+            <button
+              onClick={handleViewProperties}
               className="text-xl bg-primary py-3 px-8 text-white rounded-lg me-3 mb-2 border border-primary hover:bg-darkGreen"
             >
-              Buy House
-            </Link>
+              View Properties
+            </button>
             <Link
               href="/properties/properties-list"
-              className="text-xl hover:bg-primary hover:text-white py-3 px-8 text-primary border border-primary rounded-lg me-3 mb-2"
+              className="text-xl hover:bg-primary hover:text-white py-3 px-8 text-primary border border-primary rounded-lg me-3 mb-2 inline-block"
             >
-              Sell House
+              Browse All
             </Link>
           </div>
         </div>
         <div className="lg:w-auto w-full" data-aos="fade-right">
           <div className="bg-primary rounded-t-lg p-16 w-full">
             <p className="text-4xl text-white mb-6 font-bold flex items-center justify-center">
-              Savings Calculator
+              Budget Finder
             </p>
-            <div className="flex justify-center">
-              <div className="flex p-3 border-4 rounded-full bg-transparent border-cyan items-center justify-center">
-                <button
-                  className={`px-6 py-2 text-base focus:outline-none ${
-                    activeTab === "buy"
-                      ? "text-white bg-cyan rounded-full"
-                      : "text-white transition duration-300 rounded-full"
-                  }`}
-                  onClick={() => handleTabChange("buy")}
-                >
-                  Buy
-                </button>
-                <button
-                  className={`px-6 py-2 text-base focus:outline-none ${
-                    activeTab === "sell"
-                      ? "text-white bg-cyan rounded-full"
-                      : "text-white transition duration-300 rounded-full"
-                  }`}
-                  onClick={() => handleTabChange("sell")}
-                >
-                  Sell
-                </button>
-              </div>
-            </div>
             <div className="items-center justify-center mt-12">
-              <p className="text-white flex items-center justify-center font-bold">
-                SAVINGS
+              <p className="text-white flex items-center justify-center font-bold mb-2">
+                YOUR BUDGET
               </p>
-              <p className="mb-6 text-white flex items-center justify-center font-bold text-[50px] leading-[1.2]">
-                ${price}
+              <p className="mb-6 text-white flex items-center justify-center font-bold text-[50px] leading-[1.2] min-h-[60px]">
+                {price > 0 ? `${formatRWF(price)} RWF` : '0 RWF'}
               </p>
-              <input
-                type="range"
-                min="10000"
-                max="4000000"
-                step=""
-                value={price}
-                onChange={handlePriceChange}
-                className="w-full h-2 bg-darkGreen rounded-lg appearance-none cursor-pointer "
-              />
-            </div>
-            <div className="flex justify-between text-sm text-white mt-2 font-bold">
-              <p>$10K</p>
-              <p>$400K</p>
+              {minPrice > 0 && maxPrice > 0 && (
+                <>
+                  <input
+                    type="range"
+                    min={minPrice}
+                    max={maxPrice}
+                    step={Math.max(1, Math.floor((maxPrice - minPrice) / 1000))}
+                    value={price}
+                    onChange={handlePriceChange}
+                    className="w-full h-2 bg-darkGreen rounded-lg appearance-none cursor-pointer transition-none"
+                  />
+                  <div className="flex justify-between text-sm text-white mt-2 font-bold">
+                    <p>{formatRWF(minPrice)} RWF</p>
+                    <p>{formatRWF(maxPrice)} RWF</p>
+                  </div>
+                </>
+              )}
+              {availableCount > 0 && (
+                <>
+                  <p className="text-white text-center mt-4 text-lg">
+                    {availableCount} {availableCount === 1 ? 'property' : 'properties'} available from this budget
+                  </p>
+                  <div className="flex justify-center mt-4">
+                    <button
+                      onClick={handleViewProperties}
+                      className="text-sm bg-darkGreen hover:bg-primary text-white py-2 px-6 rounded-lg transition-colors duration-200 font-medium"
+                    >
+                      View Properties
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           </div>
           <div className="p-4 bg-darkGreen text-white text-xl rounded-b-lg">

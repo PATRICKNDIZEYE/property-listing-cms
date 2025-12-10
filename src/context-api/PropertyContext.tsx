@@ -34,6 +34,7 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
     baths: '',
     garages: '',
     tag: '',
+    minPrice: '',
   });
 
   // Fetch properties from the API route
@@ -55,6 +56,10 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
   // Apply filters whenever `filters` or `allProperties` change
   useEffect(() => {
     const filteredProperties = allProperties.filter((property) => {
+      // Parse property price (remove currency symbols and commas)
+      const propertyPrice = parseInt(property.property_price.replace(/[^0-9]/g, ''), 10) || 0;
+      const minPrice = filters.minPrice ? parseInt(filters.minPrice.toString().replace(/[^0-9]/g, ''), 10) : 0;
+      
       return (
         (!filters.keyword || property.property_title.toLowerCase().includes(filters.keyword.toLowerCase())) &&
         (!filters.location || property.location.toLowerCase() === filters.location.toLowerCase()) &&
@@ -62,7 +67,8 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
         (!filters.status || property.status === filters.status) &&
         (!filters.category || property.category.toLowerCase() === filters.category.toLowerCase()) &&
         (!filters.beds || property.beds === Number(filters.beds)) &&
-        (!filters.garages || property.garages === Number(filters.garages))
+        (!filters.garages || property.garages === Number(filters.garages)) &&
+        (!filters.minPrice || propertyPrice >= minPrice)
       );
     });
 
