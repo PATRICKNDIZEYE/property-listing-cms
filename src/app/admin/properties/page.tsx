@@ -16,7 +16,7 @@ export default function PropertiesPage() {
             Hillside Prime Management
           </h1>
           <p className="text-gray dark:text-gray mt-1">
-            Manage your Hillside Prime listings
+            Manage your Hillside Prime Properties
           </p>
         </div>
         <Link

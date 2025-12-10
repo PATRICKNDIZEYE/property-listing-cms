@@ -7,8 +7,12 @@ export const metadata: Metadata = {
   title: 'Edit Hillside Prime',
 };
 
-export default function EditPropertyPage(props: any) {
-  const { params } = props;
+export default async function EditPropertyPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
@@ -27,7 +31,7 @@ export default function EditPropertyPage(props: any) {
           </p>
         </div>
       </div>
-      <PropertyForm propertyId={params.id} />
+      <PropertyForm propertyId={id} />
     </div>
   );
 }

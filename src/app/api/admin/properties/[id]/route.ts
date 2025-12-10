@@ -6,14 +6,19 @@ import { join } from 'path';
 
 export async function GET(
   request: NextRequest,
-  context: any
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const { params } = context;
   try {
+    const { id } = await params;
+    
+    if (!id) {
+      return NextResponse.json({ error: 'Property ID is required' }, { status: 400 });
+    }
+
     await requireAdmin();
 
     const property = await prisma.property.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         images: true,
       },
@@ -36,10 +41,15 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  context: any
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const { params } = context;
   try {
+    const { id } = await params;
+    
+    if (!id) {
+      return NextResponse.json({ error: 'Property ID is required' }, { status: 400 });
+    }
+
     await requireAdmin();
 
     const body = await request.json();
@@ -68,7 +78,7 @@ export async function PUT(
 
     // Check if property exists
     const existing = await prisma.property.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!existing) {
@@ -114,7 +124,7 @@ export async function PUT(
     if (featured !== undefined) updateData.featured = featured;
 
     const property = await prisma.property.update({
-      where: { id: params.id },
+      where: { id },
       data: updateData,
       include: {
         images: true,
@@ -134,14 +144,19 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  context: any
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const { params } = context;
   try {
+    const { id } = await params;
+    
+    if (!id) {
+      return NextResponse.json({ error: 'Property ID is required' }, { status: 400 });
+    }
+
     await requireAdmin();
 
     const property = await prisma.property.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         images: true,
       },
@@ -167,16 +182,29 @@ export async function DELETE(
 
     // Delete property (cascade will delete image records from database)
     await prisma.property.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
-    return NextResponse.json({ message: 'Hillside Prime deleted successfully' });
+    return NextResponse.json({ 
+      success: true,
+      message: 'Hillside Prime deleted successfully' 
+    });
   } catch (error: any) {
+    console.error('Delete property error:', error);
+    
     if (error.message?.includes('Unauthorized')) {
       return NextResponse.json({ error: error.message }, { status: 401 });
     }
+    
+    if (error.code === 'P2025') {
+      return NextResponse.json({ 
+        error: 'Property not found' 
+      }, { status: 404 });
+    }
+    
     return NextResponse.json({ 
-      error: error.message || 'Failed to delete Hillside Prime' 
+      error: error.message || 'Failed to delete Hillside Prime',
+      details: process.env.NODE_ENV === 'development' ? error.stack : undefined
     }, { status: 500 });
   }
 }

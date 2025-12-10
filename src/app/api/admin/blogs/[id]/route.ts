@@ -4,14 +4,14 @@ import { requireAdmin } from '@/lib/auth';
 
 export async function GET(
   request: NextRequest,
-  context: any
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const { params } = context;
+  const { id } = await params;
   try {
     await requireAdmin();
 
     const blog = await prisma.blog.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!blog) {
@@ -36,9 +36,9 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  context: any
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const { params } = context;
+  const { id } = await params;
   try {
     await requireAdmin();
 
@@ -47,7 +47,7 @@ export async function PUT(
 
     // Check if blog exists
     const existing = await prisma.blog.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!existing) {
@@ -69,7 +69,7 @@ export async function PUT(
     }
 
     const blog = await prisma.blog.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         ...(title && { title }),
         ...(slug && { slug }),
@@ -100,14 +100,14 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  context: any
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const { params } = context;
+  const { id } = await params;
   try {
     await requireAdmin();
 
     const blog = await prisma.blog.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!blog) {
@@ -115,7 +115,7 @@ export async function DELETE(
     }
 
     await prisma.blog.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json({ message: 'Blog deleted successfully' });

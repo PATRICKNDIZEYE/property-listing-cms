@@ -4,6 +4,7 @@ import { useState } from 'react';
 import AdminHeader from './AdminHeader';
 import AdminSidebar from './AdminSidebar';
 import Breadcrumb from './Breadcrumb';
+import SessionMonitor from '../session-monitor';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -19,6 +20,9 @@ export default function AdminLayout({ children, showBreadcrumb = true }: AdminLa
 
   return (
     <div className="flex h-screen bg-gray-50 dark:bg-darkmode">
+      {/* Session Monitor - tracks inactivity and manages session timeout */}
+      <SessionMonitor />
+      
       {/* Sidebar */}
       <AdminSidebar collapsed={sidebarCollapsed} />
       

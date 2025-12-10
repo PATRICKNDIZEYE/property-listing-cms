@@ -104,7 +104,7 @@ export default function Calculator() {
             className="text-4xl mb-4 font-bold text-midnight_text dark:text-white"
             data-aos="fade-left"
           >
-            Find Your Perfect Property
+            Find Your Perfect Properties
           </h2>
           <p className="text-xl text-gray mb-12" data-aos="fade-left">
             Set your budget and discover properties that match your financial goals. 

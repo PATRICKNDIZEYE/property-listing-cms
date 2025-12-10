@@ -22,6 +22,10 @@ declare module 'next-auth/jwt' {
   interface JWT {
     role: UserRole;
     id: string;
+    lastActivity?: number; // Timestamp of last user activity
+    iat?: number; // Issued at time
+    expired?: boolean; // Whether session expired due to inactivity
+    expiredAt?: number; // When the session expired
   }
 }
 

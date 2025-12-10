@@ -6,14 +6,14 @@ import { join } from 'path';
 
 export async function GET(
   request: NextRequest,
-  context: any
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const { params } = context;
+  const { id } = await params;
   try {
     await requireAdmin();
 
     const slider = await prisma.heroSlider.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!slider) {
@@ -33,9 +33,9 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  context: any
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const { params } = context;
+  const { id } = await params;
   try {
     await requireAdmin();
 
@@ -43,7 +43,7 @@ export async function PUT(
     const { imageUrl, section, order } = body;
 
     const slider = await prisma.heroSlider.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!slider) {
@@ -59,7 +59,7 @@ export async function PUT(
     }
 
     const updatedSlider = await prisma.heroSlider.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         ...(imageUrl && { imageUrl }),
         ...(section && { section }),
@@ -80,14 +80,14 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  context: any
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const { params } = context;
+  const { id } = await params;
   try {
     await requireAdmin();
 
     const slider = await prisma.heroSlider.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!slider) {
@@ -107,7 +107,7 @@ export async function DELETE(
 
     // Delete from database
     await prisma.heroSlider.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json({ success: true });
@@ -120,4 +120,5 @@ export async function DELETE(
     }, { status: 500 });
   }
 }
+
 

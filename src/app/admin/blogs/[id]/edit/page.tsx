@@ -7,8 +7,12 @@ export const metadata: Metadata = {
   title: 'Edit Blog',
 };
 
-export default function EditBlogPage(props: any) {
-  const { params } = props;
+export default async function EditBlogPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
@@ -27,7 +31,7 @@ export default function EditBlogPage(props: any) {
           </p>
         </div>
       </div>
-      <BlogForm blogId={params.id} />
+      <BlogForm blogId={id} />
     </div>
   );
 }

@@ -102,7 +102,7 @@ export default async function Post({ params }: any) {
                                 />
                             )}
                             <div className="">
-                                <span className="text-[22px] leading-[1.2] font-bold text-midnight_text dark:text-white">Silicaman</span>
+                                <span className="text-[22px] leading-[1.2] font-bold text-midnight_text dark:text-white">{post.author || 'Admin'}</span>
                                 <p className="text-xl text-gray dark:text-white">Author</p>
                             </div>
                         </div>
@@ -113,19 +113,18 @@ export default async function Post({ params }: any) {
                 <div className="container lg:max-w-screen-xl md:max-w-screen-md mx-auto">
                     <div className=" flex flex-wrap justify-center">
                         <div className="w-full px-4">
-                            <div
-                                className="z-20 mb-16 h-80 overflow-hidden rounded md:h-25 lg:h-31.25">
-                                {post.coverImage && (
+                            {post.coverImage && (
+                                <div className="z-20 mb-16 h-80 overflow-hidden rounded md:h-25 lg:h-31.25">
                                     <Image
                                         src={post.coverImage}
-                                        alt="image"
+                                        alt={post.title || "Blog cover image"}
                                         width={1170}
                                         height={766}
                                         quality={100}
                                         className="h-full w-full object-cover object-center rounded-3xl"
                                     />
-                                )}
-                            </div>
+                                </div>
+                            )}
                             <div className="-mx-4 flex flex-wrap">
                                 <div className="w-full px-4 lg:w-8/12">
                                     <div className="blog-details xl:pr-10">

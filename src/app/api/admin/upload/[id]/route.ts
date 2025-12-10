@@ -6,14 +6,14 @@ import { join } from 'path';
 
 export async function DELETE(
   request: NextRequest,
-  context: any
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const { params } = context;
+  const { id } = await params;
   try {
     await requireAdmin();
 
     const image = await prisma.image.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!image) {
@@ -34,7 +34,7 @@ export async function DELETE(
 
     // Delete from database
     await prisma.image.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json({ message: 'Image deleted successfully' });

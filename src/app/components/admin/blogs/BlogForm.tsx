@@ -22,6 +22,8 @@ interface BlogFormProps {
 export default function BlogForm({ blogId }: BlogFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [imageLoading, setImageLoading] = useState(false);
+  const [imagePreview, setImagePreview] = useState<string>('');
   const [formData, setFormData] = useState<BlogFormData>({
     title: '',
     slug: '',
@@ -54,9 +56,60 @@ export default function BlogForm({ blogId }: BlogFormProps) {
           published: blog.published,
           date: blog.date ? new Date(blog.date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
         });
+        if (blog.coverImage) {
+          setImagePreview(blog.coverImage);
+        }
       }
     } catch (error) {
       toast.error('Failed to load blog');
+    }
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please upload an image file');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('File size must be less than 5MB');
+      return;
+    }
+
+    setImageLoading(true);
+    const uploadFormData = new FormData();
+    uploadFormData.append('file', file);
+
+    try {
+      const response = await fetch('/api/admin/upload', {
+        method: 'POST',
+        body: uploadFormData,
+      });
+
+      const data = await response.json();
+      
+      if (response.ok) {
+        const imageUrl = data.image?.url || data.url;
+        if (!imageUrl) {
+          toast.error('Invalid response from server');
+          return;
+        }
+        setFormData((prev) => ({
+          ...prev,
+          coverImage: imageUrl,
+        }));
+        setImagePreview(imageUrl);
+        toast.success('Image uploaded successfully');
+      } else {
+        toast.error(data.error || 'Failed to upload image');
+      }
+    } catch (error: any) {
+      toast.error(error.message || 'Error uploading image');
+    } finally {
+      setImageLoading(false);
     }
   };
 
@@ -186,22 +239,71 @@ export default function BlogForm({ blogId }: BlogFormProps) {
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label className="block text-sm font-medium text-midnight_text dark:text-white mb-2">
-              Cover Image URL
-            </label>
-            <input
-              type="text"
-              name="coverImage"
-              value={formData.coverImage}
-              onChange={handleChange}
-              title="URL to cover image"
-              placeholder="/images/blog/blog-image.jpg"
-              className="w-full px-4 py-3 border border-border dark:border-dark_border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary dark:bg-darkmode dark:text-white"
-            />
+        <div>
+          <label className="block text-sm font-medium text-midnight_text dark:text-white mb-2">
+            Cover Image
+          </label>
+          <div className="space-y-3">
+            {imagePreview && (
+              <div className="relative w-full h-48 border border-border dark:border-dark_border rounded-lg overflow-hidden bg-light dark:bg-darklight">
+                <img
+                  src={imagePreview}
+                  alt="Cover preview"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            )}
+            <div className="flex gap-3">
+              <label className="flex-1 cursor-pointer">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  disabled={imageLoading}
+                  className="hidden"
+                />
+                <div className={`w-full px-4 py-3 border-2 border-dashed border-primary dark:border-primary rounded-lg text-center transition-colors ${
+                  imageLoading 
+                    ? 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 cursor-not-allowed' 
+                    : 'bg-primary/5 dark:bg-primary/10 text-primary dark:text-primary hover:bg-primary/10 dark:hover:bg-primary/20 cursor-pointer'
+                }`}>
+                  {imageLoading ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Uploading...
+                    </span>
+                  ) : imagePreview ? (
+                    <span className="font-medium">Change Image</span>
+                  ) : (
+                    <span className="font-medium flex items-center justify-center gap-2">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                      </svg>
+                      Click to Upload Image
+                    </span>
+                  )}
+                </div>
+              </label>
+              {imagePreview && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setImagePreview('');
+                    setFormData((prev) => ({ ...prev, coverImage: '' }));
+                  }}
+                  className="px-4 py-3 border border-red-300 dark:border-red-700 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors font-medium"
+                >
+                  Remove
+                </button>
+              )}
+            </div>
           </div>
+        </div>
 
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className="block text-sm font-medium text-midnight_text dark:text-white mb-2">
               Author

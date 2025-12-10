@@ -53,18 +53,24 @@ export default function PropertyList() {
     try {
       const response = await fetch(`/api/admin/properties/${id}`, {
         method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        toast.success('Hillside Prime deleted successfully');
-        fetchProperties();
+        toast.success(data.message || 'Hillside Prime deleted successfully');
+        // Refresh the list
+        await fetchProperties();
       } else {
         toast.error(data.error || 'Failed to delete Hillside Prime');
+        console.error('Delete error:', data);
       }
     } catch (error: any) {
-      toast.error(error.message || 'Error deleting Hillside Prime');
+      console.error('Delete request error:', error);
+      toast.error(error.message || 'Error deleting Hillside Prime. Please try again.');
     }
   };
 

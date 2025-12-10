@@ -89,6 +89,8 @@ export async function getPostBySlug(slug: string, fields: string[] = []) {
       if (field === "excerpt") items[field] = blog.excerpt;
       if (field === "coverImage") items[field] = blog.coverImage;
       if (field === "date") items[field] = blog.date;
+      if (field === "author") items[field] = blog.author;
+      if (field === "authorImage") items[field] = null; // Not stored in database, can be added later
     });
 
     return items;
