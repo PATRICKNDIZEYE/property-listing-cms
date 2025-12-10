@@ -29,6 +29,14 @@ interface PropertyFormData {
   featured: boolean;
 }
 
+interface PropertySection {
+  id?: string;
+  name: string;
+  description: string;
+  images: Array<{ id: string; url: string; filename: string }>;
+  order: number;
+}
+
 interface PropertyFormProps {
   propertyId?: string;
 }
@@ -38,6 +46,7 @@ export default function PropertyForm({ propertyId }: PropertyFormProps) {
   const [loading, setLoading] = useState(false);
   const [imageLoading, setImageLoading] = useState(false);
   const [imagePreview, setImagePreview] = useState<string>('');
+  const [sections, setSections] = useState<PropertySection[]>([]);
   const [formData, setFormData] = useState<PropertyFormData>({
     propertyImg: '/images/properties/prop-1.jpg',
     propertyTitle: '',
@@ -95,6 +104,17 @@ export default function PropertyForm({ propertyId }: PropertyFormProps) {
           featured: property.featured,
         });
         setImagePreview(property.propertyImg);
+        
+        // Load sections if they exist
+        if (property.sections) {
+          setSections(property.sections.map((section: any) => ({
+            id: section.id,
+            name: section.name,
+            description: section.description || '',
+            images: section.images || [],
+            order: section.order || 0,
+          })));
+        }
       }
     } catch (error) {
       toast.error('Failed to load property');
@@ -197,6 +217,41 @@ export default function PropertyForm({ propertyId }: PropertyFormProps) {
       const data = await response.json();
       
       if (response.ok) {
+        const savedPropertyId = data.id || propertyId;
+        
+        // Save sections
+        if (sections.length > 0 && savedPropertyId) {
+          for (const section of sections) {
+            const imageIds = section.images.map(img => img.id);
+            
+            if (section.id) {
+              // Update existing section
+              await fetch(`/api/admin/properties/${savedPropertyId}/sections/${section.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  name: section.name,
+                  description: section.description,
+                  order: section.order,
+                  imageIds,
+                }),
+              });
+            } else {
+              // Create new section
+              await fetch(`/api/admin/properties/${savedPropertyId}/sections`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  name: section.name,
+                  description: section.description,
+                  order: section.order,
+                  imageIds,
+                }),
+              });
+            }
+          }
+        }
+        
         toast.success(propertyId ? 'Property updated successfully' : 'Property created successfully');
         router.push('/admin/properties');
         router.refresh();
@@ -208,6 +263,84 @@ export default function PropertyForm({ propertyId }: PropertyFormProps) {
     } finally {
       setLoading(false);
     }
+  };
+
+  const addSection = () => {
+    setSections([...sections, {
+      name: '',
+      description: '',
+      images: [],
+      order: sections.length,
+    }]);
+  };
+
+  const removeSection = (index: number) => {
+    const section = sections[index];
+    if (section.id && propertyId) {
+      // Delete from server
+      fetch(`/api/admin/properties/${propertyId}/sections/${section.id}`, {
+        method: 'DELETE',
+      }).catch(console.error);
+    }
+    setSections(sections.filter((_, i) => i !== index));
+  };
+
+  const updateSection = (index: number, field: keyof PropertySection, value: any) => {
+    const updated = [...sections];
+    updated[index] = { ...updated[index], [field]: value };
+    setSections(updated);
+  };
+
+  const handleSectionImageUpload = async (sectionIndex: number, file: File) => {
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please upload an image file');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('File size must be less than 5MB');
+      return;
+    }
+
+    const uploadFormData = new FormData();
+    uploadFormData.append('file', file);
+    if (propertyId) {
+      uploadFormData.append('propertyId', propertyId);
+    }
+
+    try {
+      const response = await fetch('/api/admin/upload', {
+        method: 'POST',
+        body: uploadFormData,
+      });
+
+      const data = await response.json();
+      
+      if (response.ok) {
+        const imageUrl = data.image?.url || data.url;
+        const imageId = data.image?.id || data.id;
+        
+        if (imageUrl) {
+          const updated = [...sections];
+          updated[sectionIndex].images = [
+            ...updated[sectionIndex].images,
+            { id: imageId, url: imageUrl, filename: file.name },
+          ];
+          setSections(updated);
+          toast.success('Image uploaded successfully');
+        }
+      } else {
+        toast.error(data.error || 'Failed to upload image');
+      }
+    } catch (error: any) {
+      toast.error(error.message || 'Error uploading image');
+    }
+  };
+
+  const removeSectionImage = (sectionIndex: number, imageIndex: number) => {
+    const updated = [...sections];
+    updated[sectionIndex].images = updated[sectionIndex].images.filter((_, i) => i !== imageIndex);
+    setSections(updated);
   };
 
   return (
@@ -530,7 +663,7 @@ export default function PropertyForm({ propertyId }: PropertyFormProps) {
                     Upload Property Image
                   </p>
                   <p className="text-xs text-gray dark:text-gray">
-                    PNG, JPG up to 5MB
+                    PNG, JPG, AVIF up to 5MB
                   </p>
                 </div>
               </div>
@@ -554,6 +687,127 @@ export default function PropertyForm({ propertyId }: PropertyFormProps) {
               </button>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Property Sections */}
+      <div className="bg-white dark:bg-semidark rounded-xl shadow-lg overflow-hidden">
+        <div className="bg-gradient-to-r from-orange-500 to-orange-600 p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-2xl font-bold text-white flex items-center gap-3">
+                <Icon icon="ion:grid-outline" width={28} height={28} />
+                Property Sections
+              </h2>
+              <p className="text-orange-100 text-sm mt-1">Add sections like Kitchen, Veranda, Living Room, etc. with multiple images</p>
+            </div>
+            <button
+              type="button"
+              onClick={addSection}
+              className="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg transition-colors flex items-center gap-2"
+            >
+              <Icon icon="ion:add" width={20} height={20} />
+              Add Section
+            </button>
+          </div>
+        </div>
+
+        <div className="p-8 space-y-6">
+          {sections.length === 0 && (
+            <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+              <Icon icon="ion:information-circle-outline" width={48} height={48} className="mx-auto mb-4 opacity-50" />
+              <p>No sections added yet. Click "Add Section" to get started.</p>
+            </div>
+          )}
+
+          {sections.map((section, sectionIndex) => (
+            <div key={sectionIndex} className="border border-border dark:border-dark_border rounded-lg p-6 space-y-4">
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-midnight_text dark:text-white mb-2">
+                      Section Name *
+                    </label>
+                    <input
+                      type="text"
+                      value={section.name}
+                      onChange={(e) => updateSection(sectionIndex, 'name', e.target.value)}
+                      placeholder="e.g., Kitchen, Veranda, Living Room"
+                      className="w-full px-4 py-2 border border-border dark:border-dark_border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 dark:bg-darkmode dark:text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-midnight_text dark:text-white mb-2">
+                      Description
+                    </label>
+                    <input
+                      type="text"
+                      value={section.description}
+                      onChange={(e) => updateSection(sectionIndex, 'description', e.target.value)}
+                      placeholder="Brief description of this section"
+                      className="w-full px-4 py-2 border border-border dark:border-dark_border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 dark:bg-darkmode dark:text-white"
+                    />
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => removeSection(sectionIndex)}
+                  className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                  title="Remove section"
+                >
+                  <Icon icon="ion:trash" width={20} height={20} />
+                </button>
+              </div>
+
+              {/* Section Images */}
+              <div>
+                <label className="block text-sm font-semibold text-midnight_text dark:text-white mb-2">
+                  Images ({section.images.length} uploaded)
+                </label>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                  {section.images.map((image, imageIndex) => (
+                    <div key={imageIndex} className="relative group">
+                      <div className="relative w-full h-32 bg-light dark:bg-darklight rounded-lg overflow-hidden">
+                        <Image
+                          src={image.url}
+                          alt={image.filename}
+                          fill
+                          className="object-cover"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removeSectionImage(sectionIndex, imageIndex)}
+                          className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                          title="Remove image"
+                        >
+                          <Icon icon="ion:close" width={16} height={16} />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={(e) => {
+                    const files = Array.from(e.target.files || []);
+                    files.forEach(file => handleSectionImageUpload(sectionIndex, file));
+                  }}
+                  className="hidden"
+                  id={`section-image-${sectionIndex}`}
+                />
+                <button
+                  type="button"
+                  onClick={() => document.getElementById(`section-image-${sectionIndex}`)?.click()}
+                  className="w-full p-4 border-2 border-dashed border-border dark:border-dark_border rounded-lg hover:border-orange-500 transition-colors text-center text-sm text-midnight_text dark:text-white"
+                >
+                  <Icon icon="ion:cloud-upload-outline" width={24} height={24} className="mx-auto mb-2" />
+                  Upload Images (Multiple allowed)
+                </button>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 

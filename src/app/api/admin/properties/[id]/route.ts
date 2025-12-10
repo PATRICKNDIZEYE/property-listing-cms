@@ -21,6 +21,14 @@ export async function GET(
       where: { id },
       include: {
         images: true,
+        sections: {
+          include: {
+            images: true,
+          },
+          orderBy: {
+            order: 'asc',
+          },
+        },
       },
     });
 
@@ -128,6 +136,14 @@ export async function PUT(
       data: updateData,
       include: {
         images: true,
+        sections: {
+          include: {
+            images: true,
+          },
+          orderBy: {
+            order: 'asc',
+          },
+        },
       },
     });
 
@@ -159,6 +175,14 @@ export async function DELETE(
       where: { id },
       include: {
         images: true,
+        sections: {
+          include: {
+            images: true,
+          },
+          orderBy: {
+            order: 'asc',
+          },
+        },
       },
     });
 

@@ -18,6 +18,14 @@ export async function GET(request: NextRequest) {
         orderBy: { createdAt: 'desc' },
         include: {
           images: true,
+          sections: {
+            include: {
+              images: true,
+            },
+            orderBy: {
+              order: 'asc',
+            },
+          },
         },
       }),
       prisma.property.count(),

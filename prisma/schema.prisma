@@ -96,6 +96,7 @@ model Property {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
   images       Image[]
+  sections     PropertySection[]
 
   @@map("properties")
 }
@@ -126,9 +127,25 @@ model Image {
   size        Int
   propertyId  String?
   property    Property? @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  sectionId   String?
+  section     PropertySection? @relation(fields: [sectionId], references: [id], onDelete: Cascade)
   createdAt   DateTime @default(now())
 
   @@map("images")
+}
+
+model PropertySection {
+  id          String   @id @default(cuid())
+  name        String   // e.g., "Kitchen", "Veranda", "Living Room", etc.
+  description String?  @db.Text
+  propertyId  String
+  property    Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  images      Image[]
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("property_sections")
 }
 
 model SiteSettings {
