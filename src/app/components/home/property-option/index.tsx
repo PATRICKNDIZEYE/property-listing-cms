@@ -18,8 +18,9 @@ export default function DiscoverProperties() {
 
             // Only count properties where check is true (if it exists)
             data.forEach((item: any) => {
-                // Filter by check property if it exists
-                if (item.check === false) return;
+                // Filter by check property - only count if check is explicitly true
+                // Skip if check is false, undefined, null, or any other value
+                if (item.check !== true) return;
                 
                 if (categoryMap[item.category]) {
                     categoryMap[item.category].count += 1;

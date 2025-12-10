@@ -39,26 +39,49 @@ export const authOptions: NextAuthOptions = {
   },
   callbacks: {
     async jwt({ token, user, trigger }) {
+      const now = Math.floor(Date.now() / 1000);
+      
       // On initial login, set user data and activity timestamp
       if (user) {
         token.role = user.role;
         token.id = user.id;
-        token.lastActivity = Math.floor(Date.now() / 1000); // Current timestamp in seconds
-        token.iat = Math.floor(Date.now() / 1000); // Issued at time
+        token.lastActivity = now; // Current timestamp in seconds
+        token.iat = now; // Issued at time
+        token.expired = false;
+        return token;
       }
       
-      // On session update (triggered by activity), update lastActivity
-      if (trigger === 'update') {
-        token.lastActivity = Math.floor(Date.now() / 1000);
-      }
-      
-      // Check for inactivity timeout
-      const now = Math.floor(Date.now() / 1000);
+      // Get current lastActivity or use issued at time as fallback
       const lastActivity = (token.lastActivity as number) || token.iat || now;
       const inactiveTime = now - lastActivity;
       
+      // On session update (triggered by activity via update() call), update lastActivity
+      // This is the primary way to refresh activity when user is active
+      if (trigger === 'update') {
+        token.lastActivity = now;
+        token.expired = false;
+        return token;
+      }
+      
+      // Fallback: Update lastActivity on JWT callback if user is still active
+      // This ensures session refresh calls properly update activity even if trigger === 'update' doesn't fire
+      // Only update if:
+      // 1. User hasn't exceeded inactivity timeout
+      // 2. At least 1 minute has passed since last update (to avoid excessive updates on every request)
+      if (inactiveTime <= INACTIVITY_TIMEOUT && !token.expired) {
+        const timeSinceLastUpdate = now - lastActivity;
+        // Update activity timestamp if at least 1 minute has passed (throttle to avoid excessive updates)
+        if (timeSinceLastUpdate >= 60) {
+          token.lastActivity = now;
+        }
+      }
+      
+      // Check for inactivity timeout with updated lastActivity
+      const currentLastActivity = (token.lastActivity as number) || token.iat || now;
+      const currentInactiveTime = now - currentLastActivity;
+      
       // If user has been inactive for more than INACTIVITY_TIMEOUT, mark as expired
-      if (inactiveTime > INACTIVITY_TIMEOUT) {
+      if (currentInactiveTime > INACTIVITY_TIMEOUT) {
         token.expired = true;
         token.expiredAt = now;
       } else {
