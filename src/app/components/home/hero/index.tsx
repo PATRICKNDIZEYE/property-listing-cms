@@ -24,7 +24,6 @@ const Hero = () => {
   const [sellSliders, setSellSliders] = useState<HeroSlider[]>([]);
   const [buySliders, setBuySliders] = useState<HeroSlider[]>([]);
   const sliderRef = useRef<Slider>(null);
-  const [activePart, setActivePart] = useState<1 | 2>(1); // Part 1 = right, Part 2 = left
 
   useEffect(() => {
     const fetchData = async () => {
@@ -52,7 +51,6 @@ const Hero = () => {
 
         if (sellResponse.ok) {
           const sellData = await sellResponse.json();
-          console.log('Sell sliders data:', sellData);
           setSellSliders(sellData.sliders || []);
         } else {
           setSellSliders([]);
@@ -60,7 +58,6 @@ const Hero = () => {
 
         if (buyResponse.ok) {
           const buyData = await buyResponse.json();
-          console.log('Buy sliders data:', buyData);
           setBuySliders(buyData.sliders || []);
         } else {
           setBuySliders([]);
@@ -85,9 +82,17 @@ const Hero = () => {
   };
 
   const currentSliders = activeTab === 'sell' ? sellSliders : buySliders;
-  
-  // Debug log
-  console.log('Current sliders:', currentSliders.length, 'Active tab:', activeTab);
+
+  // Debug: Log slider data
+  useEffect(() => {
+    console.log('Hero Slider Debug:', {
+      activeTab,
+      sellSlidersCount: sellSliders.length,
+      buySlidersCount: buySliders.length,
+      currentSlidersCount: currentSliders.length,
+      currentSliders: currentSliders.map(s => ({ id: s.id, imageUrl: s.imageUrl }))
+    });
+  }, [activeTab, sellSliders, buySliders, currentSliders]);
 
   // Reset slider when sliders change or tab changes
   useEffect(() => {
@@ -101,14 +106,6 @@ const Hero = () => {
     }
   }, [currentSliders.length, activeTab]);
 
-  // Auto-switch between Part 1 and Part 2 every 2 seconds
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setActivePart((prev) => (prev === 1 ? 2 : 1));
-    }, 2000);
-
-    return () => clearInterval(interval);
-  }, []);
 
   const sliderSettings = {
     dots: false,
@@ -159,125 +156,122 @@ const Hero = () => {
   };
 
   return (
-    <section className="relative pt-44 pb-0 dark:bg-darklight overflow-x-hidden min-h-[600px]">
-      {/* Full background imigongo pattern for dark mode */}
+    <section className="relative dark:bg-darklight overflow-x-hidden" style={{ minHeight: 'calc(100vh - 96px)', paddingTop: '96px' }}>
+      {/* Full background imigongo pattern for dark mode - Behind slider */}
       <div 
-        className="absolute inset-0 z-0 w-full h-full hidden dark:block"
+        className="absolute inset-0 w-full h-full hidden dark:block"
         style={{
           backgroundImage: imigongoPattern,
           backgroundSize: '480px 480px',
-          backgroundRepeat: 'repeat'
+          backgroundRepeat: 'repeat',
+          zIndex: 0,
+          opacity: 0.15
         }}
       ></div>
 
-      {/* Split-screen container */}
-      <div className="absolute inset-0 z-0 w-full h-full flex">
-        {/* Part 1 - Right Side */}
+      {/* Background Slider - Always show if sliders exist - On top of pattern */}
+      {currentSliders.length > 0 ? (
         <div 
-          className={`relative w-1/2 h-full ${
-            activePart === 1 ? 'z-10' : 'z-0'
-          }`}
+          className="absolute inset-0 w-full overflow-hidden hero-slider" 
+          style={{ 
+            height: 'calc(100vh - 96px)',
+            minHeight: 'calc(100vh - 96px)',
+            position: 'absolute',
+            top: '96px',
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 1,
+            backgroundColor: '#F4EEDF'
+          }}
         >
-          {activePart === 1 && currentSliders.length > 0 && (
-            <div className="absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out">
-              <Slider 
-                key={`slider-${activeTab}-${currentSliders.length}-${currentSliders.map(s => s.id).join('-')}`}
-                ref={sliderRef} 
-                {...sliderSettings}
-              >
-                {currentSliders.map((slider, index) => (
-                  <div key={slider.id} className="relative" style={{ height: '600px' }}>
-                    <Image
-                      src={slider.imageUrl}
-                      alt={`Hero background ${slider.order + 1}`}
-                      fill
-                      className="object-cover"
-                      priority={index === 0}
-                      quality={90}
-                      sizes="50vw"
-                      unoptimized={false}
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-b from-white/90 from-10% dark:from-darkmode/90 to-herobg/90 to-90% dark:to-darklight/90 z-10 pointer-events-none"></div>
-                  </div>
-                ))}
-              </Slider>
-            </div>
-          )}
+          <div style={{ height: '100%', width: '100%', position: 'relative' }}>
+            <Slider 
+              key={`slider-${activeTab}-${currentSliders.length}-${currentSliders.map(s => s.id).join('-')}`}
+              ref={sliderRef} 
+              {...sliderSettings}
+            >
+              {currentSliders.map((slider, index) => (
+                <div 
+                  key={`${slider.id}-${index}`} 
+                  style={{ 
+                    height: 'calc(100vh - 96px)',
+                    minHeight: 'calc(100vh - 96px)',
+                    width: '100%',
+                    position: 'relative',
+                    backgroundColor: '#F4EEDF'
+                  }}
+                >
+                  <Image
+                    src={slider.imageUrl}
+                    alt={`Hero background ${slider.order + 1}`}
+                    fill
+                    className="object-cover"
+                    priority={index === 0}
+                    quality={100}
+                    sizes="100vw"
+                    unoptimized={slider.imageUrl.endsWith('.avif')}
+                    style={{ opacity: 1, objectFit: 'cover' }}
+                    onError={(e) => {
+                      console.error('Image load error:', slider.imageUrl, e);
+                    }}
+                    onLoad={() => {
+                      console.log('Image loaded successfully:', slider.imageUrl);
+                    }}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-b from-white/5 from-10% dark:from-darkmode/3 to-herobg/10 to-90% dark:to-darklight/5 z-10 pointer-events-none"></div>
+                </div>
+              ))}
+            </Slider>
+          </div>
         </div>
-
-        {/* Part 2 - Left Side */}
+      ) : (
         <div 
-          className={`relative w-1/2 h-full ${
-            activePart === 2 ? 'z-10' : 'z-0'
-          }`}
-        >
-          {activePart === 2 && currentSliders.length > 0 && (
-            <div className="absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out">
-              <Slider 
-                key={`slider-${activeTab}-${currentSliders.length}-${currentSliders.map(s => s.id).join('-')}-part2`}
-                {...sliderSettings}
-              >
-                {currentSliders.map((slider, index) => (
-                  <div key={slider.id} className="relative" style={{ height: '600px' }}>
-                    <Image
-                      src={slider.imageUrl}
-                      alt={`Hero background ${slider.order + 1}`}
-                      fill
-                      className="object-cover"
-                      priority={index === 0}
-                      quality={90}
-                      sizes="50vw"
-                      unoptimized={false}
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-b from-white/90 from-10% dark:from-darkmode/90 to-herobg/90 to-90% dark:to-darklight/90 z-10 pointer-events-none"></div>
-                  </div>
-                ))}
-              </Slider>
-            </div>
-          )}
-        </div>
-      </div>
-      
-      {/* Fallback gradient background if no sliders */}
-      {currentSliders.length === 0 && (
-        <div className="absolute inset-0 z-0 bg-gradient-to-b from-white/80 from-10% dark:from-darkmode/80 to-herobg/80 to-90% dark:to-darklight/80"></div>
+          className="absolute inset-0 bg-gradient-to-b from-white/80 from-10% dark:from-darkmode/80 to-herobg/80 to-90% dark:to-darklight/80" 
+          style={{ 
+            height: 'calc(100vh - 96px)', 
+            minHeight: 'calc(100vh - 96px)',
+            top: '96px',
+            zIndex: 1
+          }}
+        ></div>
       )}
 
-      <div className="container mx-auto lg:max-w-screen-xl md:max-w-screen-md relative z-20">
-        <div className="grid lg:grid-cols-12 grid-cols-1">
+      <div className="container mx-auto lg:max-w-screen-xl md:max-w-screen-md relative flex items-center justify-center" style={{ zIndex: 10, minHeight: 'calc(100vh - 96px)' }}>
+        <div className="w-full flex justify-center">
           <div
-            className="flex flex-col col-span-6 justify-center items-start"
-            data-aos="fade-right"
+            className="flex flex-col justify-center items-center text-center w-full max-w-4xl"
+            data-aos="fade-up"
           >
-            <div className="mb-8">
-              <h1 className="md:text-[50px] leading-[1.2] text-4xl  ml-4 text-midnight_text dark:text-white font-bold">
+            <div className="mb-8 px-6 py-4 bg-white/98 dark:bg-darkmode/98 rounded-2xl shadow-2xl backdrop-blur-md border border-white/50">
+              <h1 className="md:text-[50px] leading-[1.2] text-4xl text-midnight_text dark:text-white font-bold drop-shadow-lg">
               Let's work together on your next Real Estate investment
               </h1>
             </div>
             <div className="max-w-xl ml-4 sm:w-full">
-              <div className="flex gap-1 bg-trasperent">
+              <div className="flex gap-1 bg-transparent justify-center">
                 <button
-                  className={`px-9 py-3 text-xl rounded-t-md focus:outline-none ${activeTab === "sell"
-                    ? "bg-white dark:bg-darkmode text-midnight_text dark:text-white border-b border-primary"
-                    : "text-midnight_text bg-white bg-opacity-50 dark:text-white dark:bg-darkmode dark:bg-opacity-50"
+                  className={`px-9 py-3 text-xl rounded-t-md focus:outline-none shadow-lg transition-all ${activeTab === "sell"
+                    ? "bg-white dark:bg-darkmode text-midnight_text dark:text-white border-b border-primary shadow-xl"
+                    : "text-midnight_text bg-white/90 dark:text-white dark:bg-darkmode/90 shadow-md"
                     }`}
                   onClick={() => handleTabChange("sell")}
                 >
                   Sell
                 </button>
                 <button
-                  className={`px-9 py-3 text-xl rounded-t-md focus:outline-none ${activeTab === "buy"
-                    ? "bg-white dark:bg-darkmode dark:text-white text-midnight_text border-b border-primary"
-                    : "text-midnight_text bg-white bg-opacity-50 dark:text-white dark:bg-darkmode dark:bg-opacity-50"
+                  className={`px-9 py-3 text-xl rounded-t-md focus:outline-none shadow-lg transition-all ${activeTab === "buy"
+                    ? "bg-white dark:bg-darkmode dark:text-white text-midnight_text border-b border-primary shadow-xl"
+                    : "text-midnight_text bg-white/90 dark:text-white dark:bg-darkmode/90 shadow-md"
                     }`}
                   onClick={() => handleTabChange("buy")}
                 >
                   Buy
                 </button>
               </div>
-              <div className="bg-white dark:bg-transparent rounded-b-lg rounded-tr-lg">
+              <div className="bg-white/95 dark:bg-darkmode/95 rounded-b-lg rounded-tr-lg shadow-2xl backdrop-blur-sm">
                 {activeTab === "sell" && (
-                  <div className="bg-white dark:bg-darkmode rounded-b-lg rounded-tr-lg shadow-lg p-8 pb-10">
+                  <div className="bg-white dark:bg-darkmode rounded-b-lg rounded-tr-lg shadow-xl p-8 pb-10">
                     <div className="relative rounded-lg border-0 my-2">
                       <div className="relative flex items-center">
                         <div className="absolute left-0 p-4">
@@ -331,7 +325,7 @@ const Hero = () => {
                   </div>
                 )}
                 {activeTab === "buy" && (
-                  <div className="bg-white dark:bg-darkmode rounded-b-lg rounded-tr-lg shadow-lg p-8 pb-10">
+                  <div className="bg-white dark:bg-darkmode rounded-b-lg rounded-tr-lg shadow-xl p-8 pb-10">
                     <div className="rounded-lg border-0 my-2">
                       <div className="relative flex items-center">
                         <div className="absolute left-0 p-4">
@@ -385,46 +379,46 @@ const Hero = () => {
                 )}
               </div>
             </div>
-            <div className="flex flex-col justify-start ml-4 mt-8 mb-12 gap-3">
-              <div className="flex space-x-2" data-aos="fade-left">
+            <div className="flex flex-col justify-center items-center mt-8 mb-12 gap-3 px-6 py-4 bg-white/90 dark:bg-darkmode/90 rounded-xl shadow-xl backdrop-blur-sm">
+              <div className="flex space-x-2 justify-center" data-aos="fade-up">
                 <svg
-                  className="w-6 h-6 text-primary"
+                  className="w-6 h-6 text-primary drop-shadow-md"
                   fill="currentColor"
                   viewBox="0 0 24 24"
                 >
                   <path d="M12 .587l3.668 7.431L24 9.763l-6 5.847L19.336 24 12 20.019 4.664 24 6 15.61 0 9.763l8.332-1.745z" />
                 </svg>
                 <svg
-                  className="w-6 h-6 text-primary"
+                  className="w-6 h-6 text-primary drop-shadow-md"
                   fill="currentColor"
                   viewBox="0 0 24 24"
                 >
                   <path d="M12 .587l3.668 7.431L24 9.763l-6 5.847L19.336 24 12 20.019 4.664 24 6 15.61 0 9.763l8.332-1.745z" />
                 </svg>
                 <svg
-                  className="w-6 h-6 text-primary"
+                  className="w-6 h-6 text-primary drop-shadow-md"
                   fill="currentColor"
                   viewBox="0 0 24 24"
                 >
                   <path d="M12 .587l3.668 7.431L24 9.763l-6 5.847L19.336 24 12 20.019 4.664 24 6 15.61 0 9.763l8.332-1.745z" />
                 </svg>
                 <svg
-                  className="w-6 h-6 text-primary"
+                  className="w-6 h-6 text-primary drop-shadow-md"
                   fill="currentColor"
                   viewBox="0 0 24 24"
                 >
                   <path d="M12 .587l3.668 7.431L24 9.763l-6 5.847L19.336 24 12 20.019 4.664 24 6 15.61 0 9.763l8.332-1.745z" />
                 </svg>
                 <svg
-                  className="w-6 h-6 text-primary"
+                  className="w-6 h-6 text-primary drop-shadow-md"
                   fill="currentColor"
                   viewBox="0 0 24 24"
                 >
                   <path d="M12 .587l3.668 7.431L24 9.763l-6 5.847L19.336 24 12 20.019 4.664 24 6 15.61 0 9.763l8.332-1.745z" />
                 </svg>
               </div>
-              <div data-aos="fade-left">
-                <p className="text-lg dark:text-white text-black">
+              <div data-aos="fade-up">
+                <p className="text-lg dark:text-white text-black font-semibold drop-shadow-md">
                   4.9/5
                   <span className="text-gray-400"> - from 658 reviews</span>
                 </p>

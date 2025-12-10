@@ -46,6 +46,18 @@ html {
         background-size: 480px 480px;
         background-attachment: fixed;
     }
+    
+    /* Hero slider height fix - Full viewport height */
+    .hero-slider .slick-slider,
+    .hero-slider .slick-list,
+    .hero-slider .slick-track {
+        height: calc(100vh - 96px) !important;
+        min-height: calc(100vh - 96px) !important;
+    }
+    .hero-slider .slick-slide > div {
+        height: calc(100vh - 96px) !important;
+        min-height: calc(100vh - 96px) !important;
+    }
     html{
         @apply overflow-x-hidden;
     }
