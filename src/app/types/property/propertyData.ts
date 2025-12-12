@@ -17,5 +17,6 @@ export type propertyData = {
     garages: number,
     region: string,
     name: string,
-    slug: string
+    slug: string,
+    sections?: Array<{ name: string }>
 };

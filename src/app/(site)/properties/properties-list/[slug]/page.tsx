@@ -2,11 +2,11 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from "next/navigation";
 import Image from 'next/image';
-import CompanyInfo from '@/app/components/home/info';
 import Availability from '@/app/components/property-details/availability';
 import Tabbar from '@/app/components/property-details/tabbar';
 import TextSection from '@/app/components/property-details/text-section';
 import DiscoverProperties from '@/app/components/home/property-option';
+import HeroSub from '@/app/components/shared/hero-sub';
 
 
 export default function Details() {
@@ -72,11 +72,12 @@ export default function Details() {
 
   return (
     <div>
-      <section className="bg-cover pt-36 pb-20 relative bg-gradient-to-b from-white from-10% dark:from-darkmode to-herobg to-90% dark:to-darklight overflow-x-hidden" >
-        <div className="container mx-auto lg:max-w-screen-xl md:max-w-screen-md">
-          <h2 className="text-midnight_text text-4xl lg:text-[50px] leading-[1.2] md:mx-auto md:max-w-60% text-center relative font-bold dark:text-white"> {item?.property_title} </h2>
-        </div>
-      </section>
+      <HeroSub
+        title={item?.property_title || "Property"}
+        description="Hillside Prime"
+        useImigongoBackground
+        breadcrumbLinks={breadcrumbLinks}
+      />
       <section>
         <div className='container mx-auto dark:bg-darkmode py-8'>
           <div className="h-[580px] max-w-5xl mx-auto w-full">
@@ -111,7 +112,6 @@ export default function Details() {
         </div>
       </section>
       <TextSection description={item.description} />
-      <CompanyInfo />
       <Tabbar sections={item.sections || []} />
       <Availability />
       <DiscoverProperties />

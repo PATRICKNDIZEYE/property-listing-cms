@@ -173,3 +173,16 @@ html {
     background-size: 480px 480px;
     background-attachment: fixed;
 }
+
+/* In dark mode, allow the Imigongo body pattern to remain visible under common wrapper backgrounds */
+.dark section.dark\:bg-darkmode,
+.dark div.dark\:bg-darkmode,
+.dark main.dark\:bg-darkmode {
+    background-color: rgba(12, 18, 30, 0.65) !important;
+}
+
+.dark section.dark\:bg-darklight,
+.dark div.dark\:bg-darklight,
+.dark main.dark\:bg-darklight {
+    background-color: rgba(12, 18, 30, 0.55) !important;
+}

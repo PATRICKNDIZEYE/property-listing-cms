@@ -81,10 +81,7 @@ export default function Calculator() {
   }, []);
 
   const formatRWF = (amount: number) => {
-    return new Intl.NumberFormat('en-RW', {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(amount);
+    return `RWF ${Math.round(amount).toLocaleString('en-US')}`;
   };
 
   const handleViewProperties = () => {
@@ -171,7 +168,7 @@ export default function Calculator() {
                 YOUR BUDGET
               </p>
               <p className="mb-6 text-white flex items-center justify-center font-bold text-[50px] leading-[1.2] min-h-[60px]">
-                {price > 0 ? `${formatRWF(price)} RWF` : '0 RWF'}
+                {price > 0 ? formatRWF(price) : 'RWF 0'}
               </p>
               {minPrice > 0 && maxPrice > 0 && (
                 <>
@@ -185,8 +182,8 @@ export default function Calculator() {
                     className="w-full h-2 bg-darkGreen rounded-lg appearance-none cursor-pointer transition-none"
                   />
                   <div className="flex justify-between text-sm text-white mt-2 font-bold">
-                    <p>{formatRWF(minPrice)} RWF</p>
-                    <p>{formatRWF(maxPrice)} RWF</p>
+                    <p>{formatRWF(minPrice)}</p>
+                    <p>{formatRWF(maxPrice)}</p>
                   </div>
                 </>
               )}

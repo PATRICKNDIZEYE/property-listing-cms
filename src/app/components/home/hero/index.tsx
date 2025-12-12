@@ -18,8 +18,8 @@ const Hero = () => {
   const [propertiesData, setPropertiesData] = useState<any[]>([])
   const { properties, updateFilter } = useContext(PropertyContext)!;
   const [activeTab, setActiveTab] = useState("sell");
-  const [showSuggestions, setShowSuggestions] = useState(false);
   const [location, setLocation] = useState("");
+  const [propertyType, setPropertyType] = useState("");
   const [error, setError] = useState('');
   const [sellSliders, setSellSliders] = useState<HeroSlider[]>([]);
   const [buySliders, setBuySliders] = useState<HeroSlider[]>([]);
@@ -127,33 +127,36 @@ const Hero = () => {
   const imigongoPattern = "url(\"data:image/svg+xml,%3Csvg width='240' height='240' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cpattern id='imigongo' x='0' y='0' width='240' height='240' patternUnits='userSpaceOnUse'%3E%3Cg opacity='0.1'%3E%3Cpath d='M120,120 L100,100 L120,80 L140,100 Z' fill='%231A1A1A'/%3E%3Cpath d='M120,120 L100,100 L120,140 L140,100 Z' fill='%231A1A1A'/%3E%3Cpath d='M120,120 L140,100 L120,80 L100,100 Z' fill='%231A1A1A'/%3E%3Cpath d='M120,120 L140,100 L120,140 L100,100 Z' fill='%231A1A1A'/%3E%3C/g%3E%3Cg opacity='0.09'%3E%3Cpath d='M80,80 L160,80 L160,160 L80,160 Z' fill='none' stroke='%231A1A1A' stroke-width='4'/%3E%3Cpath d='M60,60 L180,60 L180,180 L60,180 Z' fill='none' stroke='%231A1A1A' stroke-width='3.5'/%3E%3Cpath d='M40,40 L200,40 L200,200 L40,200 Z' fill='none' stroke='%231A1A1A' stroke-width='3'/%3E%3C/g%3E%3Cg opacity='0.11'%3E%3Cpath d='M0,0 L60,60 L0,120 L60,60 Z' fill='none' stroke='%231A1A1A' stroke-width='5'/%3E%3Cpath d='M240,0 L180,60 L240,120 L180,60 Z' fill='none' stroke='%231A1A1A' stroke-width='5'/%3E%3Cpath d='M0,240 L60,180 L0,120 L60,180 Z' fill='none' stroke='%231A1A1A' stroke-width='5'/%3E%3Cpath d='M240,240 L180,180 L240,120 L180,180 Z' fill='none' stroke='%231A1A1A' stroke-width='5'/%3E%3C/g%3E%3Cg opacity='0.08'%3E%3Cpath d='M0,0 L30,30 L60,0 L30,60 L0,60 L30,30 Z' fill='none' stroke='%231A1A1A' stroke-width='3.5'/%3E%3Cpath d='M240,0 L210,30 L180,0 L210,60 L240,60 L210,30 Z' fill='none' stroke='%231A1A1A' stroke-width='3.5'/%3E%3Cpath d='M0,240 L30,210 L60,240 L30,180 L0,180 L30,210 Z' fill='none' stroke='%231A1A1A' stroke-width='3.5'/%3E%3Cpath d='M240,240 L210,210 L180,240 L210,180 L240,180 L210,210 Z' fill='none' stroke='%231A1A1A' stroke-width='3.5'/%3E%3C/g%3E%3Cg opacity='0.07'%3E%3Cpath d='M0,120 L80,40 L160,120 L80,200 L0,120 Z' fill='none' stroke='%231A1A1A' stroke-width='3'/%3E%3Cpath d='M240,120 L160,40 L80,120 L160,200 L240,120 Z' fill='none' stroke='%231A1A1A' stroke-width='3'/%3E%3Cpath d='M120,0 L40,80 L120,160 L200,80 L120,0 Z' fill='none' stroke='%231A1A1A' stroke-width='3'/%3E%3Cpath d='M120,240 L40,160 L120,80 L200,160 L120,240 Z' fill='none' stroke='%231A1A1A' stroke-width='3'/%3E%3C/g%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23imigongo)'/%3E%3C/svg%3E\")";
 
   const handleSearchSell = () => {
-    if (location.trim() === '') {
-      setError('Please enter a location to search.');
+    setError('');
+    const hasLocation = location.trim() !== '';
+    const hasType = propertyType.trim() !== '';
+    if (!hasLocation && !hasType) {
+      setError('Please enter a location or select a property type.');
       return;
     }
-    setError('');
+
     updateFilter('location', location);
-    updateFilter('tag', 'sell');
+    updateFilter('category', propertyType);
+    updateFilter('listingCategory', 'sale');
     router.push(`/properties/properties-list`);
   };
 
   const handleSearchBuy = () => {
-    if (location.trim() === '') {
-      setError('Please enter a location to search.');
+    setError('');
+    const hasLocation = location.trim() !== '';
+    const hasType = propertyType.trim() !== '';
+    if (!hasLocation && !hasType) {
+      setError('Please enter a location or select a property type.');
       return;
     }
-    setError('');
+
     updateFilter('location', location);
-    updateFilter('tag', 'Buy');
+    updateFilter('category', propertyType);
+    updateFilter('listingCategory', 'rent');
     router.push(`/properties/properties-list`);
   };
 
-  const suggestions = Array.from(new Set(propertiesData.map((item) => item.location)));
-
-  const handleSelect = (value: any) => {
-    setLocation(value);
-    setShowSuggestions(false);
-  };
+  // Suggestions intentionally removed for a minimal UI (no "history searches")
 
   return (
     <section className="relative dark:bg-darklight overflow-x-hidden" style={{ minHeight: 'calc(100vh - 96px)', paddingTop: '96px' }}>
@@ -257,7 +260,7 @@ const Hero = () => {
                     }`}
                   onClick={() => handleTabChange("sell")}
                 >
-                  Sell
+                  Sale
                 </button>
                 <button
                   className={`px-9 py-3 text-xl rounded-t-md focus:outline-none shadow-lg transition-all ${activeTab === "buy"
@@ -266,56 +269,56 @@ const Hero = () => {
                     }`}
                   onClick={() => handleTabChange("buy")}
                 >
-                  Buy
+                  Rent
                 </button>
               </div>
               <div className="bg-white/95 dark:bg-darkmode/95 rounded-b-lg rounded-tr-lg shadow-2xl backdrop-blur-sm">
                 {activeTab === "sell" && (
                   <div className="bg-white dark:bg-darkmode rounded-b-lg rounded-tr-lg shadow-xl p-8 pb-10">
-                    <div className="relative rounded-lg border-0 my-2">
-                      <div className="relative flex items-center">
-                        <div className="absolute left-0 p-4">
-                          <Image
-                            src="/images/svgs/icon-location.svg"
-                            alt="Icon"
-                            height={24}
-                            width={24}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 my-2">
+                      <div className="relative rounded-lg border-0">
+                        <div className="relative flex items-center">
+                          <div className="absolute left-0 p-4">
+                            <Image
+                              src="/images/svgs/icon-location.svg"
+                              alt="Icon"
+                              height={24}
+                              width={24}
+                            />
+                          </div>
+                          <input
+                            type="text"
+                            placeholder="Select location"
+                            value={location}
+                            onChange={(e) => setLocation(e.target.value)}
+                            className="py-5 pr-3 pl-14 w-full rounded-lg text-black border border-border dark:text-white dark:border-dark_border focus:border-primary dark:focus:border-primary focus-visible:outline-none dark:bg-[#0c121e]"
                           />
                         </div>
-                        <input
-                          type="text"
-                          placeholder="Search Location"
-                          value={location}
-                          onChange={(e) => setLocation(e.target.value)}
-                          onFocus={() => setShowSuggestions(true)}
-                          onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
-                          className="py-5 pr-3 pl-14 w-full rounded-lg text-black border border-border dark:text-white dark:border-dark_border focus:border-primary dark:focus:border-primary focus-visible:outline-none dark:bg-[#0c121e]"
-                        />
+                      </div>
 
-                        {showSuggestions && (
-                          <div className="absolute left-0 right-0 top-full -mt-2 bg-white dark:bg-semidark border border-border rounded-md z-10 max-h-[130px] overflow-y-auto">
-                            <ul className="flex flex-col gap-2 py-4 px-8">
-                              {suggestions.map((item, index) => (
-                                <li
-                                  key={index}
-                                  onClick={() => handleSelect(item)}
-                                >
-                                  <p className="cursor-pointer text-midnight_text dark:text-white text-lg hover:text-primary dark:hover:text-primary">{item}</p>
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        )}
-
+                      <div className="relative rounded-lg border-0">
+                        <select
+                          value={propertyType}
+                          onChange={(e) => setPropertyType(e.target.value)}
+                          className="py-5 pr-10 pl-4 w-full rounded-lg text-black border border-border dark:text-white dark:border-dark_border focus:border-primary dark:focus:border-primary focus-visible:outline-none dark:bg-[#0c121e]"
+                          title="Select property type"
+                        >
+                          <option value="" disabled>
+                            Select property
+                          </option>
+                          <option value="apartment">Apartment</option>
+                          <option value="house">House</option>
+                          <option value="villa">Villa</option>
+                          <option value="office">Office</option>
+                          <option value="shop">Shop</option>
+                          <option value="warehouse">Warehouse</option>
+                        </select>
                       </div>
                     </div>
                     <div className="mt-6 flex flex-col-reverse gap-4 md:justify-between">
                       <div className="flex flex-col md:flex-row md:gap-4 w-full">
-                        <button onClick={handleSearchSell} className="flex-1 py-2 md:py-4 text-lg md:text-xl px-4 md:px-8 bg-primary text-white rounded-lg hover:bg-darkGreen transition duration-300 mb-2 md:mb-0 md:mr-2">
-                          Search
-                        </button>
-                        <button onClick={handleSearchSell} className="flex-1 py-2 md:py-4 text-lg md:text-xl px-4 md:px-8 bg-primary/80 dark:bg-primary/80 dark:hover:bg-primary dark:hover:border-primary border border-transparent text-white rounded-lg hover:bg-primary transition duration-300 text-nowrap">
-                          Advance Search
+                        <button onClick={handleSearchSell} className="w-full py-2 md:py-4 text-lg md:text-xl px-4 md:px-8 bg-primary text-white rounded-lg hover:bg-darkGreen transition duration-300">
+                          Search Property
                         </button>
                       </div>
                       {error && (
@@ -326,49 +329,50 @@ const Hero = () => {
                 )}
                 {activeTab === "buy" && (
                   <div className="bg-white dark:bg-darkmode rounded-b-lg rounded-tr-lg shadow-xl p-8 pb-10">
-                    <div className="rounded-lg border-0 my-2">
-                      <div className="relative flex items-center">
-                        <div className="absolute left-0 p-4">
-                          <Image
-                            src="/images/svgs/icon-location.svg"
-                            alt="Icon"
-                            height={24}
-                            width={24}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 my-2">
+                      <div className="rounded-lg border-0">
+                        <div className="relative flex items-center">
+                          <div className="absolute left-0 p-4">
+                            <Image
+                              src="/images/svgs/icon-location.svg"
+                              alt="Icon"
+                              height={24}
+                              width={24}
+                            />
+                          </div>
+                          <input
+                            type="text"
+                            placeholder="Select location"
+                            value={location}
+                            onChange={(e) => setLocation(e.target.value)}
+                            className="py-5 pr-3 pl-14 w-full rounded-lg text-black border border-border dark:text-white dark:border-dark_border focus:border-primary dark:focus:border-primary focus-visible:outline-none dark:bg-[#0c121e]"
                           />
                         </div>
-                        <input
-                          type="text"
-                          placeholder="Search Location"
-                          value={location}
-                          onChange={(e) => setLocation(e.target.value)}
-                          onFocus={() => setShowSuggestions(true)}
-                          onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
-                          className="py-5 pr-3 pl-14 w-full rounded-lg text-black border border-border dark:text-white dark:border-dark_border focus:border-primary dark:focus:border-primary focus-visible:outline-none dark:bg-[#0c121e]"
-                        />
-                        {showSuggestions && (
-                          <div className="absolute left-0 right-0 top-full -mt-2 bg-white border border-border rounded-md z-10 max-h-[100px] overflow-y-auto">
-                            <ul className="flex flex-col gap-2 py-4 px-8">
-                              {suggestions.map((item, index) => (
-                                <li
-                                  key={index}
-                                  className="cursor-pointer hover:text-primary"
-                                  onClick={() => handleSelect(item)}
-                                >
-                                  {item}
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        )}
+                      </div>
+
+                      <div className="rounded-lg border-0">
+                        <select
+                          value={propertyType}
+                          onChange={(e) => setPropertyType(e.target.value)}
+                          className="py-5 pr-10 pl-4 w-full rounded-lg text-black border border-border dark:text-white dark:border-dark_border focus:border-primary dark:focus:border-primary focus-visible:outline-none dark:bg-[#0c121e]"
+                          title="Select property type"
+                        >
+                          <option value="" disabled>
+                            Select property
+                          </option>
+                          <option value="apartment">Apartment</option>
+                          <option value="house">House</option>
+                          <option value="villa">Villa</option>
+                          <option value="office">Office</option>
+                          <option value="shop">Shop</option>
+                          <option value="warehouse">Warehouse</option>
+                        </select>
                       </div>
                     </div>
                     <div className="mt-6 flex flex-col-reverse gap-4 md:justify-between">
                       <div className="flex flex-col md:flex-row md:gap-4 w-full">
-                        <button onClick={handleSearchBuy} className="flex-1 py-2 md:py-4 text-lg md:text-xl px-4 md:px-8 bg-primary text-white rounded-lg hover:bg-darkGreen transition duration-300 mb-2 md:mb-0 md:mr-2">
-                          Search
-                        </button>
-                        <button onClick={handleSearchBuy} className="flex-1 py-2 md:py-4 text-lg md:text-xl px-4 md:px-8 bg-primary/80 dark:bg-primary/80 dark:hover:bg-primary dark:hover:border-primary border border-transparent text-white rounded-lg hover:bg-primary transition duration-300 text-nowrap">
-                          Advance Search
+                        <button onClick={handleSearchBuy} className="w-full py-2 md:py-4 text-lg md:text-xl px-4 md:px-8 bg-primary text-white rounded-lg hover:bg-darkGreen transition duration-300">
+                          Search Property
                         </button>
                       </div>
                       {error && (
@@ -377,51 +381,6 @@ const Hero = () => {
                     </div>
                   </div>
                 )}
-              </div>
-            </div>
-            <div className="flex flex-col justify-center items-center mt-8 mb-12 gap-3 px-6 py-4 bg-white/90 dark:bg-darkmode/90 rounded-xl shadow-xl backdrop-blur-sm">
-              <div className="flex space-x-2 justify-center" data-aos="fade-up">
-                <svg
-                  className="w-6 h-6 text-primary drop-shadow-md"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M12 .587l3.668 7.431L24 9.763l-6 5.847L19.336 24 12 20.019 4.664 24 6 15.61 0 9.763l8.332-1.745z" />
-                </svg>
-                <svg
-                  className="w-6 h-6 text-primary drop-shadow-md"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M12 .587l3.668 7.431L24 9.763l-6 5.847L19.336 24 12 20.019 4.664 24 6 15.61 0 9.763l8.332-1.745z" />
-                </svg>
-                <svg
-                  className="w-6 h-6 text-primary drop-shadow-md"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M12 .587l3.668 7.431L24 9.763l-6 5.847L19.336 24 12 20.019 4.664 24 6 15.61 0 9.763l8.332-1.745z" />
-                </svg>
-                <svg
-                  className="w-6 h-6 text-primary drop-shadow-md"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M12 .587l3.668 7.431L24 9.763l-6 5.847L19.336 24 12 20.019 4.664 24 6 15.61 0 9.763l8.332-1.745z" />
-                </svg>
-                <svg
-                  className="w-6 h-6 text-primary drop-shadow-md"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M12 .587l3.668 7.431L24 9.763l-6 5.847L19.336 24 12 20.019 4.664 24 6 15.61 0 9.763l8.332-1.745z" />
-                </svg>
-              </div>
-              <div data-aos="fade-up">
-                <p className="text-lg dark:text-white text-black font-semibold drop-shadow-md">
-                  4.9/5
-                  <span className="text-gray-400"> - from 658 reviews</span>
-                </p>
               </div>
             </div>
           </div>

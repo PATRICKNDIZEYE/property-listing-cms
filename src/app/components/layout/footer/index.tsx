@@ -242,11 +242,6 @@ const Footer = () => {
                     Hillside Prime
                   </Link>
                 </li>
-                <li>
-                  <Link href="/blogs" className="mb-3 inline-block text-base text-gray hover:text-white">
-                    Blog
-                  </Link>
-                </li>
               </ul>
             </div>
             <div className="w-full lg:col-span-4 col-span-12">

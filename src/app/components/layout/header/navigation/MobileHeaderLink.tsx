@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { HeaderItem } from '../../../../types/layout/menu';
 import { usePathname, useRouter } from 'next/navigation';
 
-const MobileHeaderLink: React.FC<{ item: HeaderItem }> = ({ item }) => {
+const MobileHeaderLink: React.FC<{ item: HeaderItem; onNavigate?: () => void }> = ({ item, onNavigate }) => {
   const [submenuOpen, setSubmenuOpen] = useState(false);
 
   const handleToggle = () => {
@@ -12,7 +12,9 @@ const MobileHeaderLink: React.FC<{ item: HeaderItem }> = ({ item }) => {
   const router = useRouter();
 
   const handlenav = () => {
-    router.push(item.href)
+    router.push(item.href);
+    onNavigate?.();
+    setSubmenuOpen(false);
   }
 
   const path = usePathname();
@@ -33,7 +35,15 @@ const MobileHeaderLink: React.FC<{ item: HeaderItem }> = ({ item }) => {
       {submenuOpen && item.submenu && (
         <div className="bg-white dark:bg-darkmode py-2 px-3 w-full">
           {item.submenu.map((subItem, index) => (
-            <Link key={index} href={subItem.href} className={`block py-2 px-3  ${subItem.href === path ? '!text-primary dark:text-primary' : 'text-gray'}`}>
+            <Link
+              key={index}
+              href={subItem.href}
+              onClick={() => {
+                onNavigate?.();
+                setSubmenuOpen(false);
+              }}
+              className={`block py-2 px-3  ${subItem.href === path ? '!text-primary dark:text-primary' : 'text-gray'}`}
+            >
               {subItem.label}
             </Link>
           ))}

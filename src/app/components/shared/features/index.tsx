@@ -1,6 +1,7 @@
 "use client";
 import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
+import { formatPriceRwf } from '@/utils/currency';
 
 export default function Features() {
     const [propertiesData, setPropertiesData] = useState<any[]>([]);
@@ -74,7 +75,7 @@ export default function Features() {
                                         </div>
                                         <div className="p-4 dark:bg-[#111929]">
                                             <div className="flex dark:text-gray justify-between items-center">
-                                                <div className="font-bold text-2xl">{property.property_price}</div>
+                                                <div className="font-bold text-2xl">{formatPriceRwf(property.property_price)}</div>
                                                 <div className='text-xs bg-herobg dark:bg-white dark:text-primary py-4 px-8 rounded-lg font-bold'>
                                                     {property.location}
                                                 </div>

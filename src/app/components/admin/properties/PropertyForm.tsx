@@ -57,9 +57,9 @@ export default function PropertyForm({ propertyId }: PropertyFormProps) {
     bathrooms: 0,
     location: '',
     livingArea: '',
-    tag: 'Buy',
+    tag: 'Rent',
     check: true,
-    status: 'Buy',
+    status: 'Rent',
     type: 'Apartment',
     beds: 0,
     garages: 0,
@@ -76,11 +76,21 @@ export default function PropertyForm({ propertyId }: PropertyFormProps) {
     }
   }, [propertyId]);
 
+  const normalizeStatus = (value: string) => {
+    const v = (value || '').toLowerCase();
+    if (v === 'buy') return 'Rent';
+    if (v === 'sell') return 'Sale';
+    if (v === 'sale') return 'Sale';
+    if (v === 'rent') return 'Rent';
+    return value || 'Rent';
+  };
+
   const fetchProperty = async () => {
     try {
       const response = await fetch(`/api/admin/properties/${propertyId}`);
       if (response.ok) {
         const property = await response.json();
+        const normalizedStatus = normalizeStatus(property.status);
         setFormData({
           propertyImg: property.propertyImg,
           propertyTitle: property.propertyTitle,
@@ -91,9 +101,9 @@ export default function PropertyForm({ propertyId }: PropertyFormProps) {
           bathrooms: property.bathrooms,
           location: property.location,
           livingArea: property.livingArea,
-          tag: property.tag,
+          tag: normalizeStatus(property.tag),
           check: property.check,
-          status: property.status,
+          status: normalizedStatus,
           type: property.type,
           beds: property.beds,
           garages: property.garages,
@@ -187,6 +197,13 @@ export default function PropertyForm({ propertyId }: PropertyFormProps) {
         [name]: value,
         slug: prev.slug || slug,
         name: prev.name || value,
+      }));
+    } else if (name === 'status') {
+      const normalized = normalizeStatus(value);
+      setFormData((prev) => ({
+        ...prev,
+        status: normalized,
+        tag: normalized, // keep tag aligned with status for consistent UI labels
       }));
     } else {
       setFormData((prev) => ({
@@ -449,9 +466,8 @@ export default function PropertyForm({ propertyId }: PropertyFormProps) {
                 className="w-full px-4 py-2 border border-border dark:border-dark_border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary dark:bg-darkmode dark:text-white"
                 title="Select property status"
               >
-                <option value="Buy">Buy</option>
                 <option value="Rent">Rent</option>
-                <option value="Sell">Sell</option>
+                <option value="Sale">Sale</option>
               </select>
             </div>
           </div>
@@ -550,20 +566,6 @@ export default function PropertyForm({ propertyId }: PropertyFormProps) {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
-            <div>
-              <label className="block text-sm font-semibold text-midnight_text dark:text-white mb-2">
-                Living Area (sq ft)
-              </label>
-              <input
-                type="text"
-                name="livingArea"
-                value={formData.livingArea}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border border-border dark:border-dark_border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 dark:bg-darkmode dark:text-white"
-                placeholder="2500 sq ft"
-              />
-            </div>
-
             <div>
               <label className="block text-sm font-semibold text-midnight_text dark:text-white mb-2">
                 Region

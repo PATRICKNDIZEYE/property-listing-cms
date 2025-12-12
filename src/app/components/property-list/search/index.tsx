@@ -1,19 +1,20 @@
 'use client'
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { Icon } from "@iconify/react";
 import Image from 'next/image';
-import HeroSub from '../../shared/hero-sub';
 import { PropertyContext } from '@/context-api/PropertyContext';
 import PropertyCard from '../../home/property-list/property-card';
 
 export default function AdvanceSearch({ category }: { category?: string }) {
-    const [price, setPrice] = useState(50);
-    const [price1, setPrice1] = useState(50);
-    const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
     const { properties, updateFilter, filters } = useContext(PropertyContext)!;
-    const [sortOrder, setSortOrder] = useState("none");
     const [isOffCanvasOpen, setIsOffCanvasOpen] = useState(false);
     const [searchData, setSearchData] = useState<any>([]);
+    const [moreOpen, setMoreOpen] = useState(false);
+
+    // Price range dropdown (opens min/max fields inside)
+    const [priceOpen, setPriceOpen] = useState(false);
+    const [minPriceInput, setMinPriceInput] = useState<string>('');
+    const [maxPriceInput, setMaxPriceInput] = useState<string>('');
 
     useEffect(() => {
         const fetchData = async () => {
@@ -37,17 +38,9 @@ export default function AdvanceSearch({ category }: { category?: string }) {
     ];
 
 
-    const handlePriceChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setPrice(Number(event.target.value));
-    };
-
-    const handlePriceChange1 = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setPrice1(Number(event.target.value));
-    };
-
-    const handleSelectChange = (key: any, value: any) => {
-
-        updateFilter(key, value);
+    const applyPrice = () => {
+        updateFilter('minPrice', minPriceInput);
+        updateFilter('maxPrice', maxPriceInput);
     };
 
     const toggleOffCanvas = () => {
@@ -57,38 +50,40 @@ export default function AdvanceSearch({ category }: { category?: string }) {
     const normalize = (str: string) =>
         str.toLowerCase().replace(/s$/, '');
 
-    const filteredProperties = category
-        ? properties.filter((data: any) =>
+    const filteredProperties = useMemo(() => {
+        if (!category) return properties;
+        return properties.filter((data: any) =>
             normalize(data.category) === normalize(category)
-        )
-        : properties;
+        );
+    }, [category, properties]);
 
-    // Sort logic
-    const sortedProperties = [...filteredProperties].sort((a, b) => {
-        const titleA = a.property_title?.toLowerCase() || "";
-        const titleB = b.property_title?.toLowerCase() || "";
+    const propertyTypes = [
+        { value: '', label: 'Select category' },
+        ...(searchData?.category || []),
+    ];
+    const locations = searchData?.locations || [];
 
-        if (sortOrder === "asc") {
-            return titleA.localeCompare(titleB);
-        } else if (sortOrder === "desc") {
-            return titleB.localeCompare(titleA);
-        }
-        return 0; // no sort
-    });
+    const listingCategories = [
+        { value: '', label: 'Select category' },
+        { value: 'rent', label: 'Rent' },
+        { value: 'sale', label: 'Sale' },
+    ];
 
-    const filteredCount = sortedProperties.length;
+    const filteredCount = filteredProperties.length;
 
     return (
         <>
-            <HeroSub
-                title={(filters?.category) ? filters?.category: "Hillside Prime List"}
-                description="Letraset sheets containing Lorem Ipsum passages and more recently with desktop publishing Variou"
-                breadcrumbLinks={breadcrumbLinks}
-            />
-            <section className='dark:bg-darkmode px-4'>
+            <section className='dark:bg-darkmode px-4 pt-24 pb-8 lg:pt-24 lg:pb-10'>
                 <div className='lg:max-w-screen-xl max-w-screen-md mx-auto'>
+                    {/* Minimal page title (no large hero / breadcrumb) */}
+                    <div className="text-center pb-2">
+                        <h1 className="text-3xl md:text-4xl font-bold text-midnight_text dark:text-white">
+                            Hillside Prime Listings
+                        </h1>
+                    </div>
+
                     <div className='flex lg:hidden justify-between items-center mb-4'>
-                        <span className='text-2xl ml-4 '>Advance Filter</span>
+                        <span className='text-2xl ml-4 '>Filters</span>
                         <button onClick={toggleOffCanvas} className='bg-primary mr-4 text-white py-3 px-6 text-base rounded-lg hover:bg-darkGreen'>
                             <svg xmlns="http://www.w3.org/2000/svg" className='w-6 h-6' viewBox="0 0 24 24">
                                 <path fill="none" stroke="currentColor" strokeLinecap="round" strokeMiterlimit="10" strokeWidth="1.5" d="M21.25 12H8.895m-4.361 0H2.75m18.5 6.607h-5.748m-4.361 0H2.75m18.5-13.214h-3.105m-4.361 0H2.75m13.214 2.18a2.18 2.18 0 1 0 0-4.36a2.18 2.18 0 0 0 0 4.36Zm-9.25 6.607a2.18 2.18 0 1 0 0-4.36a2.18 2.18 0 0 0 0 4.36Zm6.607 6.608a2.18 2.18 0 1 0 0-4.361a2.18 2.18 0 0 0 0 4.36Z" />
@@ -106,89 +101,214 @@ export default function AdvanceSearch({ category }: { category?: string }) {
                                 <button onClick={toggleOffCanvas} className='absolute top-4 right-4 text-gray dark:text-gray-500'>
                                     ✕
                                 </button>
-                                <p className='mb-6 text-2xl font-semibold'>Advanced Search</p>
+                                <p className='mb-6 text-2xl font-semibold'>Filters</p>
                                 <div className='flex flex-col gap-6'>
-                                    {/* Map through keywords */}
-                                    {searchData?.keywords?.map((option: any, index: any) => (
-                                        <div key={`keyword-${index}`} className="relative inline-block">
-                                            <input
-                                                placeholder={option.placeholder}
-                                                type='text'
-                                                className='py-3 w-full pl-3 pr-9 border border-border dark:bg-semidark dark:border-dark_border dark:focus:border-primary  !rounded-lg focus-visible:outline-none focus:border-primary'
-                                                onChange={(e) => updateFilter('keyword', e.target.value)}
-                                            />
-                                        </div>
-                                    ))}
+                                    {/* Property Type */}
+                                    <div className="relative inline-block">
+                                        <select
+                                            value={filters.category || ''}
+                                            className='custom-select py-3 text-midnight_text dark:text-gray w-full pl-3 pr-9 border border-border dark:border-dark_border dark:focus:border-primary dark:bg-semidark rounded-lg focus:border-primary'
+                                            onChange={(e) => updateFilter('category', e.target.value)}
+                                        >
+                                            {(propertyTypes as any[])?.map((option: any, index: any) => (
+                                                <option key={`type-${index}`} value={option.value}>{option.label}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+
+                                    {/* Category: Rent / Sale */}
+                                    <div className="relative inline-block">
+                                        <select
+                                            value={filters.listingCategory || ''}
+                                            className='custom-select py-3 text-midnight_text dark:text-gray w-full pl-3 pr-9 border border-border dark:border-dark_border dark:focus:border-primary dark:bg-semidark rounded-lg focus:border-primary'
+                                            onChange={(e) => updateFilter('listingCategory', e.target.value)}
+                                        >
+                                            {listingCategories.map((option, index) => (
+                                                <option key={`listing-${index}`} value={option.value}>{option.label}</option>
+                                            ))}
+                                        </select>
+                                    </div>
 
                                     {/* Render Location dropdown */}
                                     <div className="relative inline-block">
                                         <select
-                                            className='custom-select py-3 text-gray dark:text-gray w-full pl-3 pr-9 mr-2 border border-border dark:border-dark_border dark:focus:border-primary dark:bg-semidark  rounded-lg focus:border-primary'
+                                            value={filters.location || ''}
+                                            className='custom-select py-3 text-midnight_text dark:text-gray w-full pl-3 pr-9 border border-border dark:border-dark_border dark:focus:border-primary dark:bg-semidark rounded-lg focus:border-primary'
                                             onChange={(e) => updateFilter('location', e.target.value)}
                                         >
-                                            {searchData?.locations?.map((option: any, index: any) => (
+                                            {(locations as any[])?.map((option: any, index: any) => (
                                                 <option key={`location-${index}`} value={option.value}>{option.label}</option>
                                             ))}
                                         </select>
                                     </div>
 
-                                    {/* Example for range input */}
+                                    {/* Price range */}
                                     <div>
-                                        <p className='text-gray dark:text-gray font-medium'>
-                                            Distance: {price} miles
+                                        <p className="text-sm font-semibold text-midnight_text dark:text-white mb-2">
+                                            Price range
                                         </p>
-                                        <input
-                                            type="range"
-                                            min="50"
-                                            max="750"
-                                            step=""
-                                            value={price}
-                                            onChange={handlePriceChange}
-                                            className="w-full h-0.5 bg-lightborder dark:bg-dark_border mt-2 rounded-lg appearance-none cursor-pointer"
-                                        />
-                                    </div>
-
-                                    {/* Map through selects (regions, statuses, etc.) */}
-                                    {Object.entries(searchData).map(([key, options]) => (
-                                        key !== 'keywords' && key !== 'locations' && (
-                                            <div key={key} className="relative inline-block">
-                                                <select
-                                                    className='custom-select py-3 text-gray dark:text-gray w-full pl-3 pr-9 mr-2 border border-border dark:border-dark_border dark:focus:border-primary dark:bg-semidark  rounded-lg focus:border-primary'
-                                                    onChange={(e) => handleSelectChange(key, e.target.value)}
-                                                >
-                                                    {(options as { value: string; label: string }[])?.map((option, index) => (
-                                                        'value' in option && (
-                                                            <option key={`${key}-${index}`} value={option.value}>
-                                                                {option.label}
-                                                            </option>
-                                                        )
-                                                    ))}
-
-                                                </select>
+                                        <details className="group rounded-lg border border-border dark:border-dark_border bg-white/70 dark:bg-semidark/70">
+                                            <summary className="list-none cursor-pointer py-3 px-3 flex items-center justify-between text-midnight_text dark:text-white">
+                                                <span className="text-sm text-gray dark:text-gray">
+                                                    {filters.minPrice || filters.maxPrice
+                                                        ? `${filters.minPrice || '0'} - ${filters.maxPrice || 'Any'}`
+                                                        : 'Any'}
+                                                </span>
+                                                <span className="text-gray dark:text-gray group-open:rotate-180 transition-transform">
+                                                    <Icon icon="ion:chevron-down" width="18" height="18" />
+                                                </span>
+                                            </summary>
+                                            <div className="p-3 border-t border-border/60 dark:border-dark_border/60">
+                                                <div className="grid grid-cols-2 gap-3">
+                                                    <input
+                                                        type="number"
+                                                        inputMode="numeric"
+                                                        placeholder="Min"
+                                                        value={minPriceInput}
+                                                        onChange={(e) => setMinPriceInput(e.target.value)}
+                                                        className="py-3 w-full pl-3 pr-3 border border-border dark:bg-semidark dark:border-dark_border dark:focus:border-primary !rounded-lg focus-visible:outline-none focus:border-primary"
+                                                    />
+                                                    <input
+                                                        type="number"
+                                                        inputMode="numeric"
+                                                        placeholder="Max"
+                                                        value={maxPriceInput}
+                                                        onChange={(e) => setMaxPriceInput(e.target.value)}
+                                                        className="py-3 w-full pl-3 pr-3 border border-border dark:bg-semidark dark:border-dark_border dark:focus:border-primary !rounded-lg focus-visible:outline-none focus:border-primary"
+                                                    />
+                                                </div>
+                                                <div className="flex gap-3 mt-3">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => {
+                                                            setMinPriceInput('');
+                                                            setMaxPriceInput('');
+                                                            updateFilter('minPrice', '');
+                                                            updateFilter('maxPrice', '');
+                                                        }}
+                                                        className="w-1/2 border border-primary text-primary rounded-lg py-2.5 hover:bg-primary hover:text-white transition-colors"
+                                                    >
+                                                        Clear
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => {
+                                                            applyPrice();
+                                                        }}
+                                                        className="w-1/2 bg-primary hover:bg-darkGreen text-white rounded-lg py-2.5"
+                                                    >
+                                                        Apply
+                                                    </button>
+                                                </div>
                                             </div>
-                                        )
-                                    ))}
-
-                                    {/* Example for another range input */}
-                                    <div>
-                                        <p className='text-gray dark:text-gray'>
-                                            From ${price1} to $8000
-                                        </p>
-                                        <input
-                                            type="range"
-                                            min="50"
-                                            max="8000"
-                                            step=""
-                                            value={price1}
-                                            onChange={handlePriceChange1}
-                                            className="w-full h-0.5 bg-lightborder dark:bg-dark_border mt-2 rounded-lg appearance-none cursor-pointer"
-                                        />
+                                        </details>
                                     </div>
 
-                                    {/* Example button */}
-                                    <div>
-                                        <button className='bg-primary hover:bg-darkGreen text-white w-full py-3 px-6 text-base rounded-lg'>
-                                            Find Property
+                                    {/* More filters (dropdown) */}
+                                    <details className="group rounded-lg border border-border dark:border-dark_border bg-white/70 dark:bg-semidark/70">
+                                        <summary className="list-none cursor-pointer py-3 px-3 flex items-center justify-between text-midnight_text dark:text-white">
+                                            <span className="text-sm text-gray dark:text-gray">More filters</span>
+                                            <span className="text-gray dark:text-gray group-open:rotate-180 transition-transform">
+                                                <Icon icon="ion:chevron-down" width="18" height="18" />
+                                            </span>
+                                        </summary>
+                                        <div className="p-3 border-t border-border/60 dark:border-dark_border/60">
+                                            <div className="grid grid-cols-2 gap-3 mb-3">
+                                                <div>
+                                                    <label className="text-xs text-gray dark:text-gray block mb-1">Rooms</label>
+                                                    <input
+                                                        type="number"
+                                                        inputMode="numeric"
+                                                        min={0}
+                                                        placeholder="Any"
+                                                        value={filters.rooms || ''}
+                                                        onChange={(e) => updateFilter('rooms', e.target.value)}
+                                                        className="py-3 w-full pl-3 pr-3 border border-border dark:bg-semidark dark:border-dark_border dark:focus:border-primary !rounded-lg focus-visible:outline-none focus:border-primary text-midnight_text dark:text-white"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="text-xs text-gray dark:text-gray block mb-1">Bathrooms</label>
+                                                    <input
+                                                        type="number"
+                                                        inputMode="numeric"
+                                                        min={0}
+                                                        placeholder="Any"
+                                                        value={filters.baths || ''}
+                                                        onChange={(e) => updateFilter('baths', e.target.value)}
+                                                        className="py-3 w-full pl-3 pr-3 border border-border dark:bg-semidark dark:border-dark_border dark:focus:border-primary !rounded-lg focus-visible:outline-none focus:border-primary text-midnight_text dark:text-white"
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="grid grid-cols-2 gap-3 mb-3">
+                                                <label className="flex items-center gap-2 text-sm text-midnight_text dark:text-white">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={!!filters.hasGarage}
+                                                        onChange={(e) => updateFilter('hasGarage', e.target.checked)}
+                                                    />
+                                                    Garage
+                                                </label>
+                                                <label className="flex items-center gap-2 text-sm text-midnight_text dark:text-white">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={!!filters.hasParking}
+                                                        onChange={(e) => updateFilter('hasParking', e.target.checked)}
+                                                    />
+                                                    Parking
+                                                </label>
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="flex items-center gap-2 text-sm text-midnight_text dark:text-white">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={!!filters.hasSwimmingPool}
+                                                        onChange={(e) => updateFilter('hasSwimmingPool', e.target.checked)}
+                                                    />
+                                                    Swimming pool
+                                                </label>
+                                                <label className="flex items-center gap-2 text-sm text-midnight_text dark:text-white">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={!!filters.hasLivingRoom}
+                                                        onChange={(e) => updateFilter('hasLivingRoom', e.target.checked)}
+                                                    />
+                                                    Living room
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </details>
+
+                                    <div className="flex gap-3 pt-2">
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                updateFilter('category', '');
+                                                updateFilter('listingCategory', '');
+                                                updateFilter('location', '');
+                                                updateFilter('rooms', '');
+                                                updateFilter('baths', '');
+                                                updateFilter('garages', '');
+                                                updateFilter('minPrice', '');
+                                                updateFilter('maxPrice', '');
+                                                updateFilter('hasSwimmingPool', false);
+                                                updateFilter('hasLivingRoom', false);
+                                                updateFilter('hasGarage', false);
+                                                updateFilter('hasParking', false);
+                                                setMinPriceInput('');
+                                                setMaxPriceInput('');
+                                            }}
+                                            className="w-1/2 border border-primary text-primary rounded-lg py-3 hover:bg-primary hover:text-white transition-colors"
+                                        >
+                                            Clear
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setIsOffCanvasOpen(false);
+                                            }}
+                                            className='w-1/2 bg-primary hover:bg-darkGreen text-white py-3 rounded-lg'
+                                        >
+                                            Apply
                                         </button>
                                     </div>
                                 </div>
@@ -196,133 +316,262 @@ export default function AdvanceSearch({ category }: { category?: string }) {
                         </div>
                     </div>
 
-                    <div className='lg:grid lg:grid-cols-12 gap-4'>
-                        <div className='hidden lg:block lg:col-span-4'>
-                            <div className='py-14 px-8 bg-white dark:bg-semidark shadow-property rounded-lg'>
-                                <p className='mb-6 text-2xl font-semibold'>Advanced Search</p>
-                                <div className='flex flex-col gap-6'>
-                                    {/* Map through keywords */}
-                                    {searchData?.keywords?.map((option: any, index: any) => (
-                                        <div key={`keyword-${index}`} className="relative inline-block">
-                                            <input
-                                                placeholder={option.placeholder}
-                                                type='text'
-                                                className='py-3 w-full pl-3 pr-9 border border-border dark:bg-semidark dark:border-dark_border dark:focus:border-primary  !rounded-lg focus-visible:outline-none focus:border-primary'
-                                                onChange={(e) => updateFilter('keyword', e.target.value)}
-                                            />
-                                        </div>
-                                    ))}
-
-                                    {/* Render Location dropdown */}
-                                    <div className="relative inline-block">
-                                        <select
-                                            value={filters.location}
-                                            className='custom-select py-3 text-gray dark:text-gray w-full pl-3 pr-9 mr-2 border border-border dark:border-dark_border dark:focus:border-primary dark:bg-semidark  rounded-lg focus:border-primary'
-                                            onChange={(e) => updateFilter('location', e.target.value)}
-                                        >
-                                            {searchData?.locations?.map((option: any, index: any) => (
-                                                <option key={`location-${index}`} value={option.value}>{option.label}</option>
-                                            ))}
-                                        </select>
-                                    </div>
-
-                                    {/* Map through selects (regions, statuses, etc.) */}
-                                    {Object.entries(searchData).map(([key, options]) => (
-                                        key !== 'keywords' && key !== 'locations' && (
-                                            <div key={key} className="relative inline-block">
-                                                <select
-                                                    value={filters[key as keyof typeof filters] || ''}
-                                                    className='custom-select py-3 text-gray dark:text-gray w-full pl-3 pr-9 mr-2 border border-border dark:border-dark_border dark:focus:border-primary dark:bg-semidark  rounded-lg focus:border-primary'
-                                                    onChange={(e) => handleSelectChange(key, e.target.value)}
-                                                >
-                                                    {(options as { value: string; label: string }[])?.map((option, index) => (
-                                                        <option key={`${key}-${index}`} value={option.value}>
-                                                            {option.label}
-                                                        </option>
-                                                    ))}
-                                                </select>
-                                            </div>
-                                        )
-                                    ))}
-
-                                    {/* Example button */}
-                                    <div>
-                                        <button className='bg-primary hover:bg-darkGreen text-white w-full py-3 px-6 text-base rounded-lg'>
-                                            Find Property
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className='col-span-12 lg:col-span-8'>
-                            <div className="flex lg:flex-nowrap flex-wrap lg:gap-0 gap-6 w-full justify-between items-center pb-8">
-                                <div className="flex w-full justify-between px-4 flex-1">
-                                    <h5 className='text-xl '>{filteredCount} Properties Found</h5>
-                                    <p className='flex text-gray dark:text-gray gap-2 items-center'>
-                                        Sort by
-                                        <span>
-                                            <Icon
-                                                icon="fa6-solid:arrow-trend-up"
-                                                width="20"
-                                                height="20"
-                                                className=""
-                                            />
-                                        </span>
-                                    </p>
-                                </div>
-                                <div className="flex-1 flex gap-3 px-4">
-                                    <select
-                                        name="short"
-                                        className="custom-select border border-border dark:border-dark_border dark:bg-darkmode text-midnight_text focus:border-primary rounded-lg p-3 pr-9"
-                                        value={sortOrder}
-                                        onChange={(e) => setSortOrder(e.target.value)}
+                    {/* Desktop horizontal filters */}
+                    <div className="hidden lg:block mb-8">
+                        <div className="bg-white/90 dark:bg-darkmode/60 backdrop-blur-sm shadow-property rounded-xl px-6 py-5 border border-border/60 dark:border-dark_border/60">
+                            <div className="flex items-center justify-between gap-6 flex-wrap">
+                                <p className="text-xl font-semibold text-midnight_text dark:text-white">
+                                    Filters
+                                </p>
+                                <div className="flex items-center gap-3">
+                                    <button
+                                        onClick={() => {
+                                            setMinPriceInput('');
+                                            setMaxPriceInput('');
+                                            updateFilter('listingCategory', '');
+                                            updateFilter('category', '');
+                                            updateFilter('location', '');
+                                            updateFilter('rooms', '');
+                                            updateFilter('baths', '');
+                                            updateFilter('garages', '');
+                                            updateFilter('minPrice', '');
+                                            updateFilter('maxPrice', '');
+                                            updateFilter('hasSwimmingPool', false);
+                                            updateFilter('hasLivingRoom', false);
+                                            updateFilter('hasGarage', false);
+                                            updateFilter('hasParking', false);
+                                        }}
+                                        className="border border-primary text-primary hover:bg-primary hover:text-white rounded-lg px-4 py-2 text-sm transition-colors"
+                                        type="button"
                                     >
-                                        <option value="none">Sort by Title</option>
-                                        <option value="asc">Title (A-Z)</option>
-                                        <option value="desc">Title (Z-A)</option>
-                                    </select>
-
-                                    <button onClick={() => setViewMode('list')} className={`${viewMode == "list" ? 'bg-primary text-white' : 'bg-transparent text-primary'} p-3 border border-primary text-primary hover:text-white rounded-lg hover:bg-primary text-base`}>
-                                        <span>
-                                            <Icon
-                                                icon="famicons:list"
-                                                width="21"
-                                                height="21"
-                                                className=""
-                                            />
-                                        </span>
-                                    </button>
-                                    <button onClick={() => setViewMode('grid')} className={`${viewMode == "grid" ? 'bg-primary text-white' : 'bg-transparent text-primary'} p-3 border border-primary text-primary hover:text-white rounded-lg hover:bg-primary text-base`}>
-                                        <span>
-                                            <Icon
-                                                icon="ion:grid-sharp"
-                                                width="21"
-                                                height="21"
-                                                className=""
-                                            />
-                                        </span>
+                                        Clear
                                     </button>
                                 </div>
                             </div>
-                            {filteredProperties.length > 0 ?
-                                <div className={` ${viewMode === 'grid' ? 'grid sm:grid-cols-2' : 'flex flex-col'} gap-6 px-4`} style={{ minHeight: '500px' }}>
-                                    {(sortOrder ? sortedProperties : properties).map((data: any, index: any) => (
-                                        <div 
-                                            key={data.id || `property-${index}`} 
-                                            className="opacity-100 transition-opacity duration-300 ease-in-out"
-                                            style={{ minHeight: '400px' }}
-                                        >
-                                            <PropertyCard property={data} viewMode={viewMode} />
+
+                            <div className="mt-4 flex flex-wrap gap-4 items-end">
+                                {/* Property Type */}
+                                <div className="min-w-[220px]">
+                                    <label className="text-xs text-gray dark:text-gray block mb-1">Property Type</label>
+                                    <select
+                                        value={filters.category || ''}
+                                        className="custom-select py-3 text-midnight_text dark:text-gray w-full pl-3 pr-9 border border-border dark:border-dark_border dark:focus:border-primary dark:bg-semidark rounded-lg focus:border-primary"
+                                        onChange={(e) => updateFilter('category', e.target.value)}
+                                    >
+                                        {(propertyTypes as any[])?.map((option: any, index: any) => (
+                                            <option key={`type-top-${index}`} value={option.value}>{option.label}</option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                    {/* Category: Rent / Sale */}
+                                <div className="min-w-[200px]">
+                                    <label className="text-xs text-gray dark:text-gray block mb-1">Category</label>
+                                    <select
+                                        value={filters.listingCategory || ''}
+                                        className="custom-select py-3 text-midnight_text dark:text-gray w-full pl-3 pr-9 border border-border dark:border-dark_border dark:focus:border-primary dark:bg-semidark rounded-lg focus:border-primary"
+                                        onChange={(e) => updateFilter('listingCategory', e.target.value)}
+                                    >
+                                        {listingCategories.map((option, index) => (
+                                            <option key={`listing-top-${index}`} value={option.value}>{option.label}</option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                {/* Location */}
+                                <div className="min-w-[220px]">
+                                    <label className="text-xs text-gray dark:text-gray block mb-1">Location</label>
+                                    <select
+                                        value={filters.location || ''}
+                                        className="custom-select py-3 text-midnight_text dark:text-gray w-full pl-3 pr-9 border border-border dark:border-dark_border dark:focus:border-primary dark:bg-semidark rounded-lg focus:border-primary"
+                                        onChange={(e) => updateFilter('location', e.target.value)}
+                                    >
+                                        {(locations as any[])?.map((option: any, index: any) => (
+                                            <option key={`location-top-${index}`} value={option.value}>
+                                                {option.label}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                {/* Price range */}
+                                <div className="min-w-[260px] relative">
+                                    <label className="text-xs text-gray dark:text-gray block mb-1">Price range</label>
+                                    <button
+                                        type="button"
+                                        onClick={() => setPriceOpen((v) => !v)}
+                                        className="w-full flex items-center justify-between py-3 px-3 rounded-lg border border-border dark:border-dark_border bg-white/70 dark:bg-semidark/70 text-midnight_text dark:text-white"
+                                    >
+                                        <span className="text-sm text-gray dark:text-gray">
+                                            {filters.minPrice || filters.maxPrice
+                                                ? `${filters.minPrice || '0'} - ${filters.maxPrice || 'Any'}`
+                                                : 'Any'}
+                                        </span>
+                                        <span className={`${priceOpen ? 'rotate-180' : ''} transition-transform text-gray dark:text-gray`}>
+                                            <Icon icon="ion:chevron-down" width="18" height="18" />
+                                        </span>
+                                    </button>
+
+                                    {priceOpen && (
+                                        <div className="absolute left-0 top-[66px] w-full bg-white/95 dark:bg-semidark/95 backdrop-blur-sm border border-border/60 dark:border-dark_border/60 rounded-xl shadow-property p-3 z-20">
+                                            <div className="grid grid-cols-2 gap-3">
+                                                <input
+                                                    type="number"
+                                                    inputMode="numeric"
+                                                    placeholder="Min"
+                                                    value={minPriceInput}
+                                                    onChange={(e) => setMinPriceInput(e.target.value)}
+                                                    className="py-3 w-full pl-3 pr-3 border border-border dark:bg-semidark dark:border-dark_border dark:focus:border-primary !rounded-lg focus-visible:outline-none focus:border-primary"
+                                                />
+                                                <input
+                                                    type="number"
+                                                    inputMode="numeric"
+                                                    placeholder="Max"
+                                                    value={maxPriceInput}
+                                                    onChange={(e) => setMaxPriceInput(e.target.value)}
+                                                    className="py-3 w-full pl-3 pr-3 border border-border dark:bg-semidark dark:border-dark_border dark:focus:border-primary !rounded-lg focus-visible:outline-none focus:border-primary"
+                                                />
+                                            </div>
+                                            <div className="flex gap-3 mt-3">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        setMinPriceInput('');
+                                                        setMaxPriceInput('');
+                                                        updateFilter('minPrice', '');
+                                                        updateFilter('maxPrice', '');
+                                                        setPriceOpen(false);
+                                                    }}
+                                                    className="w-1/2 border border-primary text-primary rounded-lg py-2.5 hover:bg-primary hover:text-white transition-colors"
+                                                >
+                                                    Clear
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        applyPrice();
+                                                        setPriceOpen(false);
+                                                    }}
+                                                    className="w-1/2 bg-primary hover:bg-darkGreen text-white rounded-lg py-2.5"
+                                                >
+                                                    Apply
+                                                </button>
+                                            </div>
                                         </div>
-                                    ))}
+                                    )}
                                 </div>
-                                :
-                                <div className='flex flex-col gap-5 items-center justify-center pt-20'>
-                                    <Image src={"/images/not-found/no-results.png"} alt='no-result' width={100} height={100} />
-                                    <p className='text-gray'>No result found</p>
+
+                                {/* More filters (same row as Price range) */}
+                                <div className="min-w-[160px]">
+                                    <label className="text-xs text-gray dark:text-gray block mb-1">&nbsp;</label>
+                                    <button
+                                        type="button"
+                                        onClick={() => setMoreOpen((v) => !v)}
+                                        className="w-full border border-border dark:border-dark_border text-midnight_text dark:text-white rounded-lg px-4 py-3 text-sm hover:border-primary transition-colors bg-white/70 dark:bg-semidark/70"
+                                    >
+                                        More filters
+                                    </button>
                                 </div>
-                            }
+                            </div>
+
+                            {/* More filters dropdown */}
+                            {moreOpen && (
+                                <div className="relative mt-4">
+                                    <div className="absolute right-0 top-0 w-full lg:w-[620px] bg-white/95 dark:bg-semidark/95 backdrop-blur-sm border border-border/60 dark:border-dark_border/60 rounded-xl shadow-property p-4 z-20">
+                                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-start">
+                                            <div>
+                                                <label className="text-xs text-gray dark:text-gray block mb-1">Rooms</label>
+                                                <input
+                                                    type="number"
+                                                    inputMode="numeric"
+                                                    min={0}
+                                                    placeholder="Any"
+                                                    value={filters.rooms || ''}
+                                                    onChange={(e) => updateFilter('rooms', e.target.value)}
+                                                    className="py-3 w-full pl-3 pr-3 border border-border dark:bg-semidark dark:border-dark_border dark:focus:border-primary !rounded-lg focus-visible:outline-none focus:border-primary text-midnight_text dark:text-white"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="text-xs text-gray dark:text-gray block mb-1">Bathrooms</label>
+                                                <input
+                                                    type="number"
+                                                    inputMode="numeric"
+                                                    min={0}
+                                                    placeholder="Any"
+                                                    value={filters.baths || ''}
+                                                    onChange={(e) => updateFilter('baths', e.target.value)}
+                                                    className="py-3 w-full pl-3 pr-3 border border-border dark:bg-semidark dark:border-dark_border dark:focus:border-primary !rounded-lg focus-visible:outline-none focus:border-primary text-midnight_text dark:text-white"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="text-xs text-gray dark:text-gray block mb-1">Parking / Garage</label>
+                                                <div className="flex flex-col gap-2 mt-1">
+                                                    <label className="flex items-center gap-2 text-sm text-midnight_text dark:text-white">
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={!!filters.hasGarage}
+                                                            onChange={(e) => updateFilter('hasGarage', e.target.checked)}
+                                                        />
+                                                        Garage
+                                                    </label>
+                                                    <label className="flex items-center gap-2 text-sm text-midnight_text dark:text-white">
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={!!filters.hasParking}
+                                                            onChange={(e) => updateFilter('hasParking', e.target.checked)}
+                                                        />
+                                                        Parking
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 mt-4">
+                                            <label className="flex items-center gap-2 text-sm text-midnight_text dark:text-white">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={!!filters.hasSwimmingPool}
+                                                    onChange={(e) => updateFilter('hasSwimmingPool', e.target.checked)}
+                                                />
+                                                Swimming pool
+                                            </label>
+                                            <label className="flex items-center gap-2 text-sm text-midnight_text dark:text-white">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={!!filters.hasLivingRoom}
+                                                    onChange={(e) => updateFilter('hasLivingRoom', e.target.checked)}
+                                                />
+                                                Living room
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
                         </div>
+                    </div>
+
+                    {/* Listings */}
+                    <div>
+                        <div className="flex w-full justify-between px-4 pb-6">
+                            <h5 className='text-xl text-midnight_text dark:text-white'>{filteredCount} Properties Found</h5>
+                        </div>
+                        {filteredProperties.length > 0 ?
+                            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 px-4" style={{ minHeight: '500px' }}>
+                                {filteredProperties.map((data: any, index: any) => (
+                                    <div 
+                                        key={data.id || `property-${index}`} 
+                                        className="opacity-100 transition-opacity duration-300 ease-in-out"
+                                        style={{ minHeight: '400px' }}
+                                    >
+                                        <PropertyCard property={data} viewMode={'grid'} />
+                                    </div>
+                                ))}
+                            </div>
+                            :
+                            <div className='flex flex-col gap-5 items-center justify-center pt-20'>
+                                <Image src={"/images/not-found/no-results.png"} alt='no-result' width={100} height={100} />
+                                <p className='text-gray'>No result found</p>
+                            </div>
+                        }
                     </div>
                 </div>
             </section>

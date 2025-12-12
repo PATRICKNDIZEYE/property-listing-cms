@@ -23,7 +23,8 @@ const fallbackProperties = [
     garages: 0,
     region: "south",
     name: "Property 1",
-    slug: "modern-apartment"
+    slug: "modern-apartment",
+    sections: []
   },
   {
     id: '2',
@@ -44,7 +45,8 @@ const fallbackProperties = [
     garages: 1,
     region: "north",
     name: "Property 2",
-    slug: "city-apartment"
+    slug: "city-apartment",
+    sections: []
   },
   {
     id: '3',
@@ -65,7 +67,8 @@ const fallbackProperties = [
     garages: 1,
     region: "east",
     name: "Property 3",
-    slug: "luxury-apartment"
+    slug: "luxury-apartment",
+    sections: []
   },
 
   // Villa
@@ -88,7 +91,8 @@ const fallbackProperties = [
     garages: 1,
     region: "north",
     name: "Property 4",
-    slug: "mithra-villa"
+    slug: "mithra-villa",
+    sections: []
   },
   {
     id: '5',
@@ -109,7 +113,8 @@ const fallbackProperties = [
     garages: 2,
     region: "west",
     name: "Property 5",
-    slug: "palm-villa"
+    slug: "palm-villa",
+    sections: []
   },
   {
     id: '6',
@@ -130,7 +135,8 @@ const fallbackProperties = [
     garages: 2,
     region: "south",
     name: "Property 6",
-    slug: "sunset-villa"
+    slug: "sunset-villa",
+    sections: []
   },
 
   // Office
@@ -153,7 +159,8 @@ const fallbackProperties = [
     garages: 2,
     region: "central",
     name: "Property 7",
-    slug: "downtown-office"
+    slug: "downtown-office",
+    sections: []
   },
   {
     id: '8',
@@ -174,7 +181,8 @@ const fallbackProperties = [
     garages: 4,
     region: "north",
     name: "Property 8",
-    slug: "it-office-space"
+    slug: "it-office-space",
+    sections: []
   },
   {
     id: '9',
@@ -195,7 +203,8 @@ const fallbackProperties = [
     garages: 3,
     region: "east",
     name: "Property 9",
-    slug: "startup-hub"
+    slug: "startup-hub",
+    sections: []
   },
 
   // Shop
@@ -218,7 +227,8 @@ const fallbackProperties = [
     garages: 0,
     region: "west",
     name: "Property 10",
-    slug: "retail-shop"
+    slug: "retail-shop",
+    sections: []
   },
   {
     id: '11',
@@ -239,7 +249,8 @@ const fallbackProperties = [
     garages: 1,
     region: "south",
     name: "Property 11",
-    slug: "corner-store"
+    slug: "corner-store",
+    sections: []
   },
   {
     id: '12',
@@ -260,7 +271,8 @@ const fallbackProperties = [
     garages: 1,
     region: "east",
     name: "Property 12",
-    slug: "shopping-unit"
+    slug: "shopping-unit",
+    sections: []
   },
 
   // House
@@ -283,7 +295,8 @@ const fallbackProperties = [
     garages: 1,
     region: "north",
     name: "Property 13",
-    slug: "classic-house"
+    slug: "classic-house",
+    sections: []
   },
   {
     id: '14',
@@ -304,7 +317,8 @@ const fallbackProperties = [
     garages: 1,
     region: "west",
     name: "Property 14",
-    slug: "family-house"
+    slug: "family-house",
+    sections: []
   },
   {
     id: '15',
@@ -325,7 +339,8 @@ const fallbackProperties = [
     garages: 1,
     region: "south",
     name: "Property 15",
-    slug: "compact-house"
+    slug: "compact-house",
+    sections: []
   },
 
   // Warehouse
@@ -348,7 +363,8 @@ const fallbackProperties = [
     garages: 2,
     region: "central",
     name: "Property 16",
-    slug: "industrial-warehouse"
+    slug: "industrial-warehouse",
+    sections: []
   },
   {
     id: '17',
@@ -369,7 +385,8 @@ const fallbackProperties = [
     garages: 1,
     region: "north",
     name: "Property 17",
-    slug: "storage-unit"
+    slug: "storage-unit",
+    sections: []
   },
   {
     id: '18',
@@ -390,7 +407,8 @@ const fallbackProperties = [
     garages: 3,
     region: "east",
     name: "Property 18",
-    slug: "logistics-hub"
+    slug: "logistics-hub",
+    sections: []
   }
 ];
 
@@ -401,6 +419,9 @@ export async function GET() {
       orderBy: { createdAt: 'desc' },
       include: {
         images: true,
+        sections: {
+          select: { name: true },
+        },
       },
     });
 
@@ -425,6 +446,7 @@ export async function GET() {
       region: prop.region,
       name: prop.name,
       slug: prop.slug,
+      sections: prop.sections || [],
     }));
 
     return NextResponse.json(formattedProperties);

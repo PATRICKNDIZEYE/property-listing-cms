@@ -152,13 +152,6 @@ const Header: React.FC = () => {
               >
                 Sign In
               </Link>
-
-              <Link
-                href="/signup"
-                className="hidden lg:block bg-primary text-white px-4 py-2 rounded-lg hover:bg-darkGreen"
-              >
-                Sign Up
-              </Link>
             </>
           )}
 
@@ -199,7 +192,11 @@ const Header: React.FC = () => {
         </div>
         <nav className="flex flex-col items-start p-4">
           {data.map((item:any, index:any) => (
-            <MobileHeaderLink key={index} item={item} />
+            <MobileHeaderLink
+              key={index}
+              item={item}
+              onNavigate={() => setNavbarOpen(false)}
+            />
           ))}
           <div className="mt-4 flex flex-col space-y-4 w-full">
             {user?.user || session?.user ? (
@@ -235,15 +232,6 @@ const Header: React.FC = () => {
                   }}
                 >
                   Sign In
-                </Link>
-                <Link
-                  href="/signup"
-                  className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-darkGreen"
-                  onClick={() => {
-                    setNavbarOpen(false);
-                  }}
-                >
-                  Sign Up
                 </Link>
               </>
             )}
