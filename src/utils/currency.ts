@@ -17,7 +17,7 @@ export function formatPriceRwf(input: string | number): string {
 
   const rwf = isUsd ? amount * DEFAULT_USD_TO_RWF_RATE : amount;
   // Force "RWF" label explicitly (avoid locale outputs like "RF")
-  return `RWF ${Math.round(rwf).toLocaleString('en-US')}`;
+  return `${Math.round(rwf).toLocaleString('en-US')} RWF`;
 }
 
 export function normalizeListingLabel(value?: string): 'Rent' | 'Sale' | '' {

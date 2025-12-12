@@ -12,6 +12,8 @@ interface PropertyCardProps {
 
 const PropertyCard: React.FC<PropertyCardProps> = ({ property, viewMode }) => {  
   const listingLabel = normalizeListingLabel(property.status) || normalizeListingLabel(property.tag) || '';
+  const badgeFill = listingLabel === 'Rent' ? '#2563EB' : '#DC2626'; // rent=blue, sale=red
+  const badgeStroke = 'rgba(255,255,255,0.35)';
   
   return (
     <div
@@ -23,40 +25,62 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, viewMode }) => {
           <div className={`imageContainer h-[250px] w-full ${viewMode =="list" && 'h-full md:h-52'}`}>
             <Image
               src={property?.property_img}
-              alt={`Image of ${property.property_title}`}
+              alt={`Property in ${property.location}`}
               width={400}
               height={250}
               className="w-full h-full object-cover group-hover:scale-125 duration-500"
             />
           </div>
           {listingLabel && (
-            <p className="absolute top-[10px] left-[10px] py-1 px-4 bg-white rounded-md text-primary items-center">
-              {listingLabel}
-            </p>
+            <span
+              aria-label={listingLabel}
+              className="absolute top-[10px] left-[10px] z-10 tag-badge-wiggle drop-shadow-md"
+            >
+              <span className="relative inline-block">
+                <svg
+                  width="86"
+                  height="38"
+                  viewBox="0 0 86 38"
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="block"
+                >
+                  <path
+                    d="M10 19 L24 5 H84 L70 19 L84 33 H24 Z"
+                    fill={badgeFill}
+                    stroke={badgeStroke}
+                    strokeWidth="1.5"
+                  />
+                  <circle cx="24" cy="19" r="4.2" fill="rgba(255,255,255,0.85)" />
+                  <circle cx="24" cy="19" r="2.1" fill={badgeFill} opacity="0.35" />
+                </svg>
+                <span className="absolute inset-0 flex items-center justify-center pl-5 pr-2">
+                  <span className="text-[11px] font-extrabold tracking-widest text-white uppercase">
+                    {listingLabel}
+                  </span>
+                </span>
+              </span>
+            </span>
           )}
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="absolute top-[10px] right-[10px] bg-white p-2 rounded-lg"
-            viewBox="0 0 24 24"
-            width="38"
-            height="38"
-            fill="#19B57B"
-          >
-            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-          </svg>
         </div>
         <div className={`p-5 sm:p-8 dark:text-white text-opacity-50 ${viewMode=="list" && 'w-[70%] flex flex-col justify-center'}`}>
 
           <div className="flex flex-col gap-1 border-b border-border dark:border-dark_border mb-6">
             
             <div>
-              <p className="text-base text-gray">
-                {property.property_title}
-              </p>
+              <div className="flex items-center gap-2 text-base text-gray">
+                <Image
+                  src="/images/svgs/icon-location.svg"
+                  alt="Location"
+                  width={16}
+                  height={16}
+                  className="opacity-70"
+                />
+                <p className="text-base text-gray">{property.location}</p>
+              </div>
             </div>
 
             <div className="flex justify-between items-center pb-4">
-              <div className="font-bold text-2xl group-hover:text-primary text-midnight_text dark:text-white">
+              <div className="font-bold text-2xl text-[#22C55E] dark:text-[#22C55E] whitespace-nowrap tabular-nums leading-none">
                 {formatPriceRwf(property.property_price)}
               </div>
             </div>

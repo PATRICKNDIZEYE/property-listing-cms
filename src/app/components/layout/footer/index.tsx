@@ -246,27 +246,47 @@ const Footer = () => {
             </div>
             <div className="w-full lg:col-span-4 col-span-12">
               <h4 className="mb-4 text-lg text-white dark:text-white">
-                Popular Searches
+                Property Searches
               </h4>
               <ul>
-                <li onClick={() => updateFilter('category', 'apartment')}>
-                  <Link href="/properties/properties-list?category=apartment" className="mb-3 inline-block text-base text-gray hover:text-white">
+                <li
+                  onClick={() => {
+                    updateFilter('category', 'apartment');
+                    updateFilter('listingCategory', 'rent');
+                  }}
+                >
+                  <Link href="/properties/properties-list?category=apartment&listingCategory=rent" className="mb-3 inline-block text-base text-gray hover:text-white">
                     Apartment for Rent
                   </Link>
                 </li>
-                <li onClick={() => updateFilter('category', 'house')}>
-                  <Link href="/properties/properties-list?category=house" className="mb-3 inline-block text-base text-gray hover:text-white">
-                    House for Buy
+                <li
+                  onClick={() => {
+                    updateFilter('category', 'house');
+                    updateFilter('listingCategory', 'rent');
+                  }}
+                >
+                  <Link href="/properties/properties-list?category=house&listingCategory=rent" className="mb-3 inline-block text-base text-gray hover:text-white">
+                    House for Rent
                   </Link>
                 </li>
-                <li onClick={() => updateFilter('category', 'office')}>
-                  <Link href="/properties/properties-list?category=office" className="mb-3 inline-block text-base text-gray hover:text-white">
-                    Offices for Buy
+                <li
+                  onClick={() => {
+                    updateFilter('category', 'house');
+                    updateFilter('listingCategory', 'sale');
+                  }}
+                >
+                  <Link href="/properties/properties-list?category=house&listingCategory=sale" className="mb-3 inline-block text-base text-gray hover:text-white">
+                    House for Sale
                   </Link>
                 </li>
-                <li onClick={() => updateFilter('category', 'shop')}>
-                  <Link href="/properties/properties-list?category=shop" className="mb-3 inline-block text-base text-gray hover:text-white">
-                    Shop for Rent
+                <li
+                  onClick={() => {
+                    updateFilter('category', 'office');
+                    updateFilter('listingCategory', 'rent');
+                  }}
+                >
+                  <Link href="/properties/properties-list?category=office&listingCategory=rent" className="mb-3 inline-block text-base text-gray hover:text-white">
+                    Office for Rent
                   </Link>
                 </li>
               </ul>
