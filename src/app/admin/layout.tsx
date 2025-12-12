@@ -4,6 +4,10 @@ import { authOptions } from '@/lib/auth-config';
 import AdminLayout from '@/app/components/admin/layout/AdminLayout';
 import { headers } from 'next/headers';
 
+// Admin depends on request headers/session, so it must be dynamic.
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function AdminRootLayout({
   children,
 }: {
